@@ -20,7 +20,6 @@ const Login = React.lazy(() => import('../pages/auth/Login'));
 const Signup = React.lazy(() => import('../pages/auth/Signup'));
 
 // Dashboard Pages
-const Dashboard = React.lazy(() => import('../pages/dashboard'));
 const AskQuestion = React.lazy(() => import('../pages/dashboard/ask'));
 const UploadMaterials = React.lazy(() => import('../pages/dashboard/upload'));
 const StudyResources = React.lazy(() => import('../pages/dashboard/resources'));
@@ -57,8 +56,9 @@ export const AppRouter: React.FC = () => {
             </PrivateRoute>
           }
         >
-          <Route index element={withSuspense(Dashboard)} />
+          <Route index element={<Navigate to="ask" replace />} />
           <Route path="ask" element={withSuspense(AskQuestion)} />
+          <Route path="ask/:chatId" element={withSuspense(AskQuestion)} />
           <Route path="upload" element={withSuspense(UploadMaterials)} />
           <Route path="resources" element={withSuspense(StudyResources)} />
           <Route path="history" element={withSuspense(StudyHistory)} />
