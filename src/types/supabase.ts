@@ -3,7 +3,6 @@ export interface ChatInstance {
   created_at: string;
   user_id: string;
   title: string;
-  last_message_at: string;
 }
 
 export interface ChatMessage {
@@ -13,8 +12,28 @@ export interface ChatMessage {
   role: 'user' | 'assistant';
   created_at: string;
   metadata?: {
-    make_response_id?: string;
-    error?: string;
+    model?: string;
+    type?: 'text' | 'image' | 'pdf' | 'link';
+    url?: string;
+    fileType?: string;
+    fileName?: string;
+  };
+}
+
+export interface Resource {
+  id: string;
+  created_at: string;
+  user_id: string;
+  title: string;
+  content?: string;
+  url?: string;
+  file_path?: string;
+  resource_type: 'file' | 'link' | 'text';
+  metadata?: {
+    fileType?: string;
+    fileName?: string;
+    size?: number;
+    lastModified?: string;
   };
 }
 
