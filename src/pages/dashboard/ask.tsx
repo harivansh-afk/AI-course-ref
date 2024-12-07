@@ -18,6 +18,7 @@ export default function AskQuestion() {
   const [chat, setChat] = useState<ChatInstance | null>(null);
   const [isNewChat, setIsNewChat] = useState(false);
   const [hasExistingChats, setHasExistingChats] = useState<boolean | null>(null);
+  const [isTyping, setIsTyping] = useState(false);
 
   // Check for existing chats and redirect to most recent if on base path
   useEffect(() => {
@@ -121,30 +122,20 @@ export default function AskQuestion() {
         currentChatId = chatId;
       }
 
-      // Add user message
-      const userMessage = await chatService.addMessage(currentChatId, question.trim(), 'user');
-      if (userMessage) {
-        setMessages(prev => [...prev, userMessage]);
-      }
+      // Show typing indicator before sending message
+      setIsTyping(true);
 
+      // Add user message and get all updated messages including the AI response
+      const updatedMessages = await chatService.addMessage(currentChatId, question.trim(), 'user');
+      setMessages(updatedMessages);
       setQuestion('');
 
-      // TODO: Integrate with Make.com for AI response
-      // For now, using a placeholder response
-      const aiMessage = await chatService.addMessage(
-        currentChatId,
-        'This is a placeholder response. AI integration coming soon!',
-        'assistant',
-        { make_response_id: 'placeholder' }
-      );
-      if (aiMessage) {
-        setMessages(prev => [...prev, aiMessage]);
-      }
     } catch (err) {
       setError('Failed to send message');
       console.error('Failed to process message:', err);
     } finally {
       setLoading(false);
+      setIsTyping(false);
     }
   };
 
@@ -242,26 +233,41 @@ export default function AskQuestion() {
             </div>
           </div>
         ) : (
-          messages.map((message) => (
-            <div
-              key={message.id}
-              className={cn(
-                'flex w-full',
-                message.role === 'user' ? 'justify-end' : 'justify-start'
-              )}
-            >
+          <>
+            {messages.map((message) => (
               <div
+                key={message.id}
                 className={cn(
-                  'max-w-[80%] rounded-lg px-4 py-2',
-                  message.role === 'user'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted'
+                  'flex w-full',
+                  message.role === 'user' ? 'justify-end' : 'justify-start'
                 )}
               >
-                {message.content}
+                <div
+                  className={cn(
+                    'max-w-[80%] rounded-lg px-4 py-2',
+                    message.role === 'user'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted'
+                  )}
+                >
+                  {message.content}
+                </div>
               </div>
-            </div>
-          ))
+            ))}
+            {/* Typing indicator */}
+            {isTyping && (
+              <div className="flex w-full justify-start">
+                <div className="flex max-w-[80%] items-center space-x-2 rounded-lg bg-muted px-4 py-2">
+                  <div className="flex space-x-1">
+                    <span className="animate-bounce delay-0">•</span>
+                    <span className="animate-bounce delay-150">•</span>
+                    <span className="animate-bounce delay-300">•</span>
+                  </div>
+                  <span className="text-sm text-muted-foreground">AI is thinking...</span>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
 
