@@ -1,83 +1,89 @@
-import { supabase } from './supabase';
 import type { ChatInstance, ChatMessage } from '../types/supabase';
+
+// Helper function to generate UUIDs
+const generateId = () => crypto.randomUUID();
+
+// Helper functions for localStorage
+const getFromStorage = <T>(key: string): T[] => {
+  const data = localStorage.getItem(key);
+  return data ? JSON.parse(data) : [];
+};
+
+const setInStorage = <T>(key: string, data: T[]) => {
+  localStorage.setItem(key, JSON.stringify(data));
+};
 
 export const chatService = {
   async createChatInstance(userId: string, title: string): Promise<ChatInstance | null> {
-    const { data, error } = await supabase
-      .from('chat_instances')
-      .insert({
+    try {
+      const chatInstance: ChatInstance = {
+        id: generateId(),
+        created_at: new Date().toISOString(),
         user_id: userId,
         title,
         last_message_at: new Date().toISOString(),
-      })
-      .select()
-      .single();
+      };
 
-    if (error) {
+      const chats = getFromStorage<ChatInstance>('chat_instances');
+      chats.push(chatInstance);
+      setInStorage('chat_instances', chats);
+
+      return chatInstance;
+    } catch (error) {
       console.error('Error creating chat instance:', error);
       return null;
     }
-
-    return data;
   },
 
   async getChatInstance(chatId: string): Promise<ChatInstance | null> {
-    const { data, error } = await supabase
-      .from('chat_instances')
-      .select()
-      .eq('id', chatId)
-      .single();
-
-    if (error) {
+    try {
+      const chats = getFromStorage<ChatInstance>('chat_instances');
+      return chats.find(chat => chat.id === chatId) || null;
+    } catch (error) {
       console.error('Error fetching chat instance:', error);
       return null;
     }
-
-    return data;
   },
 
   async updateChatTitle(chatId: string, title: string): Promise<boolean> {
-    const { error } = await supabase
-      .from('chat_instances')
-      .update({ title })
-      .eq('id', chatId);
+    try {
+      const chats = getFromStorage<ChatInstance>('chat_instances');
+      const chatIndex = chats.findIndex(chat => chat.id === chatId);
 
-    if (error) {
+      if (chatIndex === -1) return false;
+
+      chats[chatIndex].title = title;
+      setInStorage('chat_instances', chats);
+
+      return true;
+    } catch (error) {
       console.error('Error updating chat title:', error);
       return false;
     }
-
-    return true;
   },
 
   async getChatInstances(userId: string): Promise<ChatInstance[]> {
-    const { data, error } = await supabase
-      .from('chat_instances')
-      .select()
-      .eq('user_id', userId)
-      .order('last_message_at', { ascending: false });
-
-    if (error) {
+    try {
+      const chats = getFromStorage<ChatInstance>('chat_instances');
+      return chats
+        .filter(chat => chat.user_id === userId)
+        .sort((a, b) => new Date(b.last_message_at).getTime() - new Date(a.last_message_at).getTime());
+    } catch (error) {
       console.error('Error fetching chat instances:', error);
       return [];
     }
-
-    return data;
   },
 
   async getChatMessages(chatId: string): Promise<ChatMessage[]> {
-    const { data, error } = await supabase
-      .from('chat_messages')
-      .select()
-      .eq('chat_id', chatId)
-      .order('created_at', { ascending: true });
-
-    if (error) {
+    try {
+      const messages = getFromStorage<ChatMessage>('chat_messages');
+      return messages
+        .filter(message => message.chat_id === chatId)
+        .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+    } catch (error) {
       console.error('Error fetching chat messages:', error);
       return [];
     }
-
-    return data;
   },
 
   async addMessage(
@@ -86,58 +92,51 @@ export const chatService = {
     role: 'user' | 'assistant',
     metadata?: ChatMessage['metadata']
   ): Promise<ChatMessage | null> {
-    const { data: message, error: messageError } = await supabase
-      .from('chat_messages')
-      .insert({
+    try {
+      const message: ChatMessage = {
+        id: generateId(),
         chat_id: chatId,
         content,
         role,
+        created_at: new Date().toISOString(),
         metadata,
-      })
-      .select()
-      .single();
+      };
 
-    if (messageError) {
-      console.error('Error adding message:', messageError);
+      const messages = getFromStorage<ChatMessage>('chat_messages');
+      messages.push(message);
+      setInStorage('chat_messages', messages);
+
+      // Update last_message_at in chat instance
+      const chats = getFromStorage<ChatInstance>('chat_instances');
+      const chatIndex = chats.findIndex(chat => chat.id === chatId);
+      if (chatIndex !== -1) {
+        chats[chatIndex].last_message_at = new Date().toISOString();
+        setInStorage('chat_instances', chats);
+      }
+
+      return message;
+    } catch (error) {
+      console.error('Error adding message:', error);
       return null;
     }
-
-    // Update last_message_at in chat instance
-    const { error: updateError } = await supabase
-      .from('chat_instances')
-      .update({ last_message_at: new Date().toISOString() })
-      .eq('id', chatId);
-
-    if (updateError) {
-      console.error('Error updating chat instance:', updateError);
-    }
-
-    return message;
   },
 
   async deleteChatInstance(chatId: string): Promise<boolean> {
-    // Delete all messages first
-    const { error: messagesError } = await supabase
-      .from('chat_messages')
-      .delete()
-      .eq('chat_id', chatId);
+    try {
+      // Delete all messages for this chat
+      const messages = getFromStorage<ChatMessage>('chat_messages');
+      const filteredMessages = messages.filter(message => message.chat_id !== chatId);
+      setInStorage('chat_messages', filteredMessages);
 
-    if (messagesError) {
-      console.error('Error deleting chat messages:', messagesError);
+      // Delete the chat instance
+      const chats = getFromStorage<ChatInstance>('chat_instances');
+      const filteredChats = chats.filter(chat => chat.id !== chatId);
+      setInStorage('chat_instances', filteredChats);
+
+      return true;
+    } catch (error) {
+      console.error('Error deleting chat instance:', error);
       return false;
     }
-
-    // Then delete the chat instance
-    const { error: instanceError } = await supabase
-      .from('chat_instances')
-      .delete()
-      .eq('id', chatId);
-
-    if (instanceError) {
-      console.error('Error deleting chat instance:', instanceError);
-      return false;
-    }
-
-    return true;
   },
 };
