@@ -32,10 +32,25 @@ function Settings() {
       <h1 className="text-3xl font-bold">Settings</h1>
 
       <Tabs defaultValue="chat" className="w-full">
-        <TabsList className="mb-4">
-          <TabsTrigger value="chat">Chat & RAG</TabsTrigger>
-          <TabsTrigger value="ui">UI</TabsTrigger>
-          <TabsTrigger value="privacy">Privacy</TabsTrigger>
+        <TabsList className="mb-4 bg-purple-50">
+          <TabsTrigger
+            value="chat"
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-400 data-[state=active]:to-purple-500 data-[state=active]:text-white"
+          >
+            Chat & RAG
+          </TabsTrigger>
+          <TabsTrigger
+            value="ui"
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-400 data-[state=active]:to-purple-500 data-[state=active]:text-white"
+          >
+            UI
+          </TabsTrigger>
+          <TabsTrigger
+            value="privacy"
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-400 data-[state=active]:to-purple-500 data-[state=active]:text-white"
+          >
+            Privacy
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="chat">
@@ -45,7 +60,11 @@ function Settings() {
                 <Label>Context Retention</Label>
                 <p className="text-sm text-muted-foreground">Keep conversation context for more relevant responses</p>
               </div>
-              <Switch checked={retainContext} onCheckedChange={setRetainContext} />
+              <Switch
+                checked={retainContext}
+                onCheckedChange={setRetainContext}
+                className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-purple-400 data-[state=checked]:to-purple-500"
+              />
             </div>
 
             <div className="space-y-2">
@@ -57,6 +76,7 @@ function Settings() {
                 max={20}
                 min={1}
                 step={1}
+                className="[&_.SliderTrack]:bg-purple-200 [&_.SliderRange]:bg-gradient-to-r [&_.SliderRange]:from-purple-400 [&_.SliderRange]:to-purple-500 [&_.SliderThumb]:border-purple-400"
               />
             </div>
 
@@ -65,7 +85,11 @@ function Settings() {
                 <Label>Source Attribution</Label>
                 <p className="text-sm text-muted-foreground">Show source documents for responses</p>
               </div>
-              <Switch checked={showSourceAttribution} onCheckedChange={setShowSourceAttribution} />
+              <Switch
+                checked={showSourceAttribution}
+                onCheckedChange={setShowSourceAttribution}
+                className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-purple-400 data-[state=checked]:to-purple-500"
+              />
             </div>
 
             <div className="space-y-2">
@@ -77,6 +101,7 @@ function Settings() {
                 max={1}
                 min={0}
                 step={0.1}
+                className="[&_.SliderTrack]:bg-purple-200 [&_.SliderRange]:bg-gradient-to-r [&_.SliderRange]:from-purple-400 [&_.SliderRange]:to-purple-500 [&_.SliderThumb]:border-purple-400"
               />
             </div>
           </Card>
@@ -89,7 +114,11 @@ function Settings() {
                 <Label>Dark Mode</Label>
                 <p className="text-sm text-muted-foreground">Enable dark color theme</p>
               </div>
-              <Switch checked={darkMode} onCheckedChange={setDarkMode} />
+              <Switch
+                checked={darkMode}
+                onCheckedChange={setDarkMode}
+                className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-purple-400 data-[state=checked]:to-purple-500"
+              />
             </div>
 
             <div className="flex items-center justify-between">
@@ -97,7 +126,11 @@ function Settings() {
                 <Label>Compact View</Label>
                 <p className="text-sm text-muted-foreground">Reduce spacing in chat interface</p>
               </div>
-              <Switch checked={compactView} onCheckedChange={setCompactView} />
+              <Switch
+                checked={compactView}
+                onCheckedChange={setCompactView}
+                className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-purple-400 data-[state=checked]:to-purple-500"
+              />
             </div>
 
             <div className="flex items-center justify-between">
@@ -105,7 +138,11 @@ function Settings() {
                 <Label>Message Grouping</Label>
                 <p className="text-sm text-muted-foreground">Group consecutive messages from the same source</p>
               </div>
-              <Switch checked={messageGrouping} onCheckedChange={setMessageGrouping} />
+              <Switch
+                checked={messageGrouping}
+                onCheckedChange={setMessageGrouping}
+                className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-purple-400 data-[state=checked]:to-purple-500"
+              />
             </div>
           </Card>
         </TabsContent>
@@ -117,7 +154,11 @@ function Settings() {
                 <Label>Save Chat History</Label>
                 <p className="text-sm text-muted-foreground">Store conversation history locally</p>
               </div>
-              <Switch checked={saveHistory} onCheckedChange={setSaveHistory} />
+              <Switch
+                checked={saveHistory}
+                onCheckedChange={setSaveHistory}
+                className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-purple-400 data-[state=checked]:to-purple-500"
+              />
             </div>
 
             <div className="flex items-center justify-between">
@@ -125,7 +166,11 @@ function Settings() {
                 <Label>Anonymize Data</Label>
                 <p className="text-sm text-muted-foreground">Remove personal information from logs</p>
               </div>
-              <Switch checked={anonymizeData} onCheckedChange={setAnonymizeData} />
+              <Switch
+                checked={anonymizeData}
+                onCheckedChange={setAnonymizeData}
+                className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-purple-400 data-[state=checked]:to-purple-500"
+              />
             </div>
 
             <div className="flex items-center justify-between">
@@ -133,15 +178,19 @@ function Settings() {
                 <Label>Share Analytics</Label>
                 <p className="text-sm text-muted-foreground">Help improve the app by sharing usage data</p>
               </div>
-              <Switch checked={shareAnalytics} onCheckedChange={setShareAnalytics} />
+              <Switch
+                checked={shareAnalytics}
+                onCheckedChange={setShareAnalytics}
+                className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-purple-400 data-[state=checked]:to-purple-500"
+              />
             </div>
           </Card>
         </TabsContent>
       </Tabs>
 
       <div className="flex justify-end space-x-4">
-        <Button variant="outline">Reset to Defaults</Button>
-        <Button>Save Changes</Button>
+        <Button variant="outline" className="hover:bg-purple-50">Reset to Defaults</Button>
+        <Button className="bg-gradient-to-r from-purple-400 to-purple-500 hover:from-purple-500 hover:to-purple-600 text-white">Save Changes</Button>
       </div>
     </div>
   );

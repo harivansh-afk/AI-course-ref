@@ -46,7 +46,7 @@ export default function StudyHistory() {
           <p className="text-muted-foreground">View your past conversations</p>
         </div>
         <Link to="/dashboard/ask">
-          <Button>
+          <Button className="bg-gradient-to-r from-purple-400 to-purple-500 hover:from-purple-500 hover:to-purple-600 text-white">
             <MessageSquare className="mr-2 h-4 w-4" />
             New Chat
           </Button>
@@ -60,7 +60,9 @@ export default function StudyHistory() {
             Start a new conversation to see it here
           </p>
           <Link to="/dashboard/ask" className="mt-4 inline-block">
-            <Button>Start a new chat</Button>
+            <Button className="bg-gradient-to-r from-purple-400 to-purple-500 hover:from-purple-500 hover:to-purple-600 text-white">
+              Start a new chat
+            </Button>
           </Link>
         </div>
       ) : (
@@ -68,7 +70,7 @@ export default function StudyHistory() {
           {chats.map((chat) => (
             <div
               key={chat.id}
-              className="group relative rounded-lg border bg-card p-4 transition-colors hover:bg-muted/50"
+              className="group relative rounded-lg border bg-card p-4 transition-colors hover:bg-purple-50/50"
             >
               <Link to={`/dashboard/ask/${chat.id}`} className="block">
                 <h3 className="font-medium">{chat.title}</h3>

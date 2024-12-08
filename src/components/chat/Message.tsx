@@ -84,7 +84,7 @@ export function Message({ message }: MessageProps) {
     >
       {message.role === 'assistant' && (
         <Avatar className="h-8 w-8">
-          <AvatarFallback className="bg-gradient-to-br from-blue-400 to-blue-600 text-white text-xs font-medium">
+          <AvatarFallback className="bg-gradient-to-br from-purple-300 to-purple-500 text-white text-xs font-medium">
             AI
           </AvatarFallback>
         </Avatar>
@@ -95,7 +95,7 @@ export function Message({ message }: MessageProps) {
           className={cn(
             'relative rounded-2xl px-4 py-3 text-sm',
             message.role === 'user'
-              ? 'bg-blue-500 text-white'
+              ? 'bg-gradient-to-r from-purple-400 to-purple-500 text-white'
               : 'bg-muted/50 shadow-sm border border-border/50'
           )}
         >
