@@ -108,8 +108,8 @@ export default function AskQuestion() {
     try {
       let currentChatId: string;
 
-      // If this is a new chat, create it first with the title from the first message
-      if (isNewChat) {
+      // If no chat exists or we're on the base ask page, create a new one
+      if (!chatId || chatId === undefined) {
         const title = generateChatTitle(question.trim());
         const newChat = await chatService.createChatInstance(user.id, title);
         if (!newChat) {
@@ -120,8 +120,6 @@ export default function AskQuestion() {
         setIsNewChat(false);
         // Update URL with the real chat ID
         navigate(`/dashboard/ask/${newChat.id}`, { replace: true });
-      } else if (!chatId) {
-        throw new Error('No chat ID available');
       } else {
         currentChatId = chatId;
       }
@@ -182,75 +180,73 @@ export default function AskQuestion() {
   }
 
   return (
-    <div className="h-[calc(100vh-4rem)] flex flex-col">
-      {/* Main Chat Container */}
-      <div className="flex-1 flex flex-col relative">
-        {/* Sticky Subheader */}
-        <div className="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
-          <div className="flex h-14 items-center justify-between px-4">
-            <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
-                <MessageSquarePlus className="h-4 w-4 text-primary" />
-              </div>
-              <div>
-                <h1 className="text-sm font-medium">Ask a Question</h1>
-                {chat && (
-                  <p className="text-xs text-muted-foreground line-clamp-1">
-                    {chat.title}
-                  </p>
-                )}
-              </div>
+    <div className="flex flex-col h-full">
+      {/* Header Container */}
+      <div className="flex-none bg-background rounded-lg m-4">
+        <div className="flex h-full items-center justify-between px-4">
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
+              <MessageSquarePlus className="h-4 w-4 text-primary" />
             </div>
-            <div className="flex items-center gap-2">
+            <div>
+              <h1 className="text-sm font-medium">Ask a Question</h1>
+              {chat && (
+                <p className="text-xs text-muted-foreground line-clamp-1">
+                  {chat.title}
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleNewChat}
+              className="text-muted-foreground hover:text-primary hover:bg-primary/10"
+            >
+              <MessageSquarePlus className="mr-2 h-4 w-4" />
+              New Chat
+            </Button>
+            {chatId && !isNewChat && messages.length > 0 && (
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={handleNewChat}
+                onClick={clearChat}
                 className="text-muted-foreground hover:text-primary hover:bg-primary/10"
               >
-                <MessageSquarePlus className="mr-2 h-4 w-4" />
-                New Chat
+                <X className="mr-2 h-4 w-4" />
+                Clear chat
               </Button>
-              {chatId && !isNewChat && messages.length > 0 && (
+            )}
+            {hasExistingChats && (
+              <Link to="/dashboard/history">
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={clearChat}
                   className="text-muted-foreground hover:text-primary hover:bg-primary/10"
                 >
-                  <X className="mr-2 h-4 w-4" />
-                  Clear chat
+                  <History className="mr-2 h-4 w-4" />
+                  History
                 </Button>
-              )}
-              {hasExistingChats && (
-                <Link to="/dashboard/history">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-muted-foreground hover:text-primary hover:bg-primary/10"
-                  >
-                    <History className="mr-2 h-4 w-4" />
-                    History
-                  </Button>
-                </Link>
-              )}
-            </div>
+              </Link>
+            )}
           </div>
         </div>
+      </div>
 
-        {/* Error Message */}
-        {error && (
-          <div className="flex-none mx-4 mt-4 flex items-center gap-2 rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
-            <AlertCircle className="h-4 w-4" />
-            {error}
-          </div>
-        )}
-
+      {/* Main Chat Container - Added pb-20 to create space at bottom */}
+      <div className="flex-1 bg-background rounded-lg mx-4 flex flex-col min-h-0 pb-20">
         {/* Messages Container */}
         <div className="flex-1 overflow-y-auto">
+          {error && (
+            <div className="flex-none mx-4 mt-4 flex items-center gap-2 rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
+              <AlertCircle className="h-4 w-4" />
+              {error}
+            </div>
+          )}
           <div className="flex flex-col space-y-6 p-4">
             {!isNewChat && !chatId ? (
-              <div className="h-full flex items-center justify-center min-h-[calc(100vh-12rem)]">
+              <div className="h-full flex items-center justify-center min-h-[calc(100vh-50rem)]">
                 <div className="max-w-md w-full space-y-8">
                   <div className="flex flex-col items-center text-center">
                     <div className="rounded-full bg-purple-500/20 p-6 mb-8">
@@ -371,43 +367,43 @@ export default function AskQuestion() {
             )}
           </div>
         </div>
+      </div>
 
-        {/* Input Box - Fixed at Bottom */}
-        <div className="sticky bottom-0 left-0 right-0 p-3 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <form onSubmit={handleSubmit} className="mx-auto max-w-3xl">
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                value={question}
-                onChange={(e) => setQuestion(e.target.value)}
-                placeholder="Ask me anything..."
-                className={cn(
-                  'flex-1 rounded-full px-4 py-2 text-sm',
-                  'bg-primary/5 border-primary/10',
-                  'focus:outline-none focus:ring-2 focus:ring-primary/20',
-                  'placeholder:text-muted-foreground'
-                )}
-                disabled={loading}
-              />
-              <Button
-                type="submit"
-                disabled={loading || !question.trim()}
-                className={cn(
-                  'rounded-full bg-gradient-to-r from-purple-400 to-purple-500 text-white h-8 w-8 p-0',
-                  'hover:from-purple-500 hover:to-purple-600',
-                  'focus:outline-none focus:ring-2 focus:ring-primary/20',
-                  'disabled:opacity-50'
-                )}
-              >
-                {loading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Send className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
-          </form>
-        </div>
+      {/* Input Box - Keep original styling */}
+      <div className="sticky bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <form onSubmit={handleSubmit} className="mx-auto max-w-3xl">
+          <div className="flex items-center gap-2 h-full">
+            <input
+              type="text"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              placeholder="Ask me anything..."
+              className={cn(
+                'flex-1 rounded-full px-4 py-2 text-sm',
+                'bg-primary/5 border-primary/10',
+                'focus:outline-none focus:ring-2 focus:ring-primary/20',
+                'placeholder:text-muted-foreground'
+              )}
+              disabled={loading}
+            />
+            <Button
+              type="submit"
+              disabled={loading || !question.trim()}
+              className={cn(
+                'rounded-full bg-gradient-to-r from-purple-400 to-purple-500 text-white h-8 w-8 p-0',
+                'hover:from-purple-500 hover:to-purple-600',
+                'focus:outline-none focus:ring-2 focus:ring-primary/20',
+                'disabled:opacity-50'
+              )}
+            >
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
+        </form>
       </div>
     </div>
   );

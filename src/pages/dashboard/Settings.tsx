@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/card';
 import { Label } from '../../components/ui/label';
 import { Switch } from '../../components/ui/switch';
 import { Slider } from '../../components/ui/slider';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
+import { useTheme } from '../../contexts/ThemeContext';
 
 function Settings() {
   // Chat & RAG Settings
@@ -14,8 +14,7 @@ function Settings() {
   const [relevanceThreshold, setRelevanceThreshold] = useState(0.8);
 
   // UI Settings
-  const [darkMode, setDarkMode] = useState(false);
-  const [compactView, setCompactView] = useState(false);
+  const { isDarkMode, toggleDarkMode } = useTheme();
   const [messageGrouping, setMessageGrouping] = useState(true);
 
   // Privacy Settings
@@ -32,7 +31,7 @@ function Settings() {
       <h1 className="text-3xl font-bold">Settings</h1>
 
       <Tabs defaultValue="chat" className="w-full">
-        <TabsList className="mb-4 bg-purple-50">
+        <TabsList className="mb-4 bg-muted">
           <TabsTrigger
             value="chat"
             className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-400 data-[state=active]:to-purple-500 data-[state=active]:text-white"
@@ -115,20 +114,8 @@ function Settings() {
                 <p className="text-sm text-muted-foreground">Enable dark color theme</p>
               </div>
               <Switch
-                checked={darkMode}
-                onCheckedChange={setDarkMode}
-                className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-purple-400 data-[state=checked]:to-purple-500"
-              />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div>
-                <Label>Compact View</Label>
-                <p className="text-sm text-muted-foreground">Reduce spacing in chat interface</p>
-              </div>
-              <Switch
-                checked={compactView}
-                onCheckedChange={setCompactView}
+                checked={isDarkMode}
+                onCheckedChange={toggleDarkMode}
                 className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-purple-400 data-[state=checked]:to-purple-500"
               />
             </div>
@@ -187,11 +174,6 @@ function Settings() {
           </Card>
         </TabsContent>
       </Tabs>
-
-      <div className="flex justify-end space-x-4">
-        <Button variant="outline" className="hover:bg-purple-50">Reset to Defaults</Button>
-        <Button className="bg-gradient-to-r from-purple-400 to-purple-500 hover:from-purple-500 hover:to-purple-600 text-white">Save Changes</Button>
-      </div>
     </div>
   );
 }
