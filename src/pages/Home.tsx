@@ -3,17 +3,21 @@ import { ArrowRight, Brain, Sparkles, Users, FileText, Zap, Shield, MessageSquar
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { Header } from '../components/layout/Header';
+import AIOrb from '../components/ui/AIOrb';
 
 function Home() {
   return (
     <div className="flex h-screen flex-col overflow-hidden">
       <Header />
-      <main className="flex-1 overflow-y-auto pt-24">
+      <main className="flex-1 overflow-y-auto pt-16">
         <div className="container mx-auto px-4">
           {/* Hero Section */}
-          <section className="py-20">
+          <section className="py-12">
             <div className="max-w-4xl mx-auto text-center space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-
+              <div className="relative mb-6">
+                <AIOrb />
+                <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background z-10" />
+              </div>
               <h1 className="text-6xl font-bold mb-6 gradient-text leading-tight">
                 Advanced Document Intelligence with RAG AI
               </h1>
