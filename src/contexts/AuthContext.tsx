@@ -43,12 +43,46 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     user,
     loading,
     signIn: async (email: string, password: string) => {
-      const { error } = await auth.signIn(email, password);
-      return { error };
+      try {
+        const { data, error } = await auth.signIn(email, password);
+        if (error) {
+          console.error('Sign in error:', error);
+          return { error };
+        }
+        return { error: null };
+      } catch (err) {
+        console.error('Unexpected sign in error:', err);
+        return { 
+          error: new AuthError('Failed to sign in. Please check your credentials and try again.') 
+        };
+      }
     },
     signUp: async (email: string, password: string) => {
-      const { error } = await auth.signUp(email, password);
-      return { error };
+      try {
+        if (!email || !password) {
+          return { 
+            error: new AuthError('Email and password are required.') 
+          };
+        }
+        
+        if (password.length < 6) {
+          return { 
+            error: new AuthError('Password must be at least 6 characters long.') 
+          };
+        }
+
+        const { data, error } = await auth.signUp(email, password);
+        if (error) {
+          console.error('Sign up error:', error);
+          return { error };
+        }
+        return { error: null };
+      } catch (err) {
+        console.error('Unexpected sign up error:', err);
+        return { 
+          error: new AuthError('Failed to create account. Please try again.') 
+        };
+      }
     },
     signOut: async () => {
       const { error } = await auth.signOut();

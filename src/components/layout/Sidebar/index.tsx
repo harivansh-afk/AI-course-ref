@@ -4,7 +4,6 @@ import {
   Settings,
   MessageSquarePlus,
   Upload,
-  BookOpen,
   History
 } from 'lucide-react';
 import { cn } from '../../../lib/utils';
@@ -25,12 +24,6 @@ const sidebarItems = [
     label: 'Upload Materials',
     path: '/dashboard/upload'
   },
-  {
-    icon: BookOpen,
-    label: 'Study Resources',
-    path: '/dashboard/resources'
-  },
-
   {
     icon: Settings,
     label: 'Settings',

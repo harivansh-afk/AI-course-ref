@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Send, Loader2, X, History, MessageSquarePlus, AlertCircle } from 'lucide-react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
+import { ScrollArea } from '../../components/ui/ScrollArea';
+import { Message } from '../../components/chat/Message';
+import { Avatar, AvatarFallback } from '../../components/ui/Avatar';
 import { cn } from '../../lib/utils';
 import { useAuth } from '../../contexts/AuthContext';
 import { chatService } from '../../lib/chat-service';
@@ -171,117 +174,148 @@ export default function AskQuestion() {
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex items-center justify-between border-b px-4 py-3">
-        <div>
-          <h1 className="text-lg font-semibold">Ask a Question</h1>
-          {chat && (
-            <p className="text-sm text-muted-foreground">
-              {chat.title}
-            </p>
-          )}
-        </div>
-        <div className="flex items-center gap-2">
-          <Button onClick={handleNewChat}>
-            <MessageSquarePlus className="mr-2 h-4 w-4" />
-            New Chat
-          </Button>
-          {chatId && !isNewChat && messages.length > 0 && (
-            <Button variant="ghost" size="sm" onClick={clearChat}>
-              <X className="mr-2 h-4 w-4" />
-              Clear chat
+      <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="flex h-14 items-center justify-between px-4">
+          <div className="flex items-center gap-2">
+            <MessageSquarePlus className="h-5 w-5 text-muted-foreground" />
+            <div>
+              <h1 className="text-sm font-semibold">Ask a Question</h1>
+              {chat && (
+                <p className="text-xs text-muted-foreground line-clamp-1">
+                  {chat.title}
+                </p>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={handleNewChat}>
+              <MessageSquarePlus className="mr-2 h-4 w-4" />
+              New Chat
             </Button>
-          )}
-          {hasExistingChats && (
-            <Link to="/dashboard/history">
-              <Button variant="ghost" size="sm">
-                <History className="mr-2 h-4 w-4" />
-                History
+            {chatId && !isNewChat && messages.length > 0 && (
+              <Button variant="ghost" size="sm" onClick={clearChat}>
+                <X className="mr-2 h-4 w-4" />
+                Clear chat
               </Button>
-            </Link>
-          )}
+            )}
+            {hasExistingChats && (
+              <Link to="/dashboard/history">
+                <Button variant="ghost" size="sm">
+                  <History className="mr-2 h-4 w-4" />
+                  History
+                </Button>
+              </Link>
+            )}
+          </div>
         </div>
       </div>
 
       {error && (
-        <div className="m-4 flex items-center gap-2 rounded-lg bg-destructive/15 p-3 text-sm text-destructive">
+        <div className="mx-4 mt-4 flex items-center gap-2 rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
           <AlertCircle className="h-4 w-4" />
           {error}
         </div>
       )}
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {!isNewChat && !chatId ? (
-          <div className="flex h-full items-center justify-center text-center">
-            <div className="max-w-md space-y-4">
-              <p className="text-lg font-medium">Welcome to StudyAI Chat</p>
-              <p className="text-sm text-muted-foreground">
-                Start a new conversation by clicking the "New Chat" button above
-              </p>
-              <Button onClick={handleNewChat}>
-                <MessageSquarePlus className="mr-2 h-4 w-4" />
-                Start New Chat
-              </Button>
-            </div>
-          </div>
-        ) : messages.length === 0 ? (
-          <div className="flex h-full items-center justify-center text-center">
-            <div className="max-w-md space-y-2">
-              <p className="text-lg font-medium">No messages yet</p>
-              <p className="text-sm text-muted-foreground">
-                Start by asking a question about your studies
-              </p>
-            </div>
-          </div>
-        ) : (
-          <>
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={cn(
-                  'flex w-full',
-                  message.role === 'user' ? 'justify-end' : 'justify-start'
-                )}
-              >
-                <div
-                  className={cn(
-                    'max-w-[80%] rounded-lg px-4 py-2',
-                    message.role === 'user'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted'
-                  )}
-                >
-                  {message.content}
-                </div>
-              </div>
-            ))}
-            {/* Typing indicator */}
-            {isTyping && (
-              <div className="flex w-full justify-start">
-                <div className="flex max-w-[80%] items-center space-x-2 rounded-lg bg-muted px-4 py-2">
-                  <div className="flex space-x-1">
-                    <span className="animate-bounce delay-0">•</span>
-                    <span className="animate-bounce delay-150">•</span>
-                    <span className="animate-bounce delay-300">•</span>
+      <div className="flex-1 overflow-hidden">
+        <ScrollArea className="h-full">
+          <div className="flex flex-col space-y-6 p-4">
+            {!isNewChat && !chatId ? (
+              <div className="flex h-[calc(100vh-12rem)] flex-col items-center justify-center text-center">
+                <div className="mx-auto flex max-w-md flex-col items-center space-y-4">
+                  <div className="rounded-full bg-primary/10 p-3">
+                    <MessageSquarePlus className="h-6 w-6 text-primary" />
                   </div>
-                  <span className="text-sm text-muted-foreground">AI is thinking...</span>
+                  <div className="space-y-2">
+                    <h2 className="text-lg font-semibold">Welcome to StudyAI Chat</h2>
+                    <p className="text-sm text-muted-foreground">
+                      Start a new conversation to get answers to your questions
+                    </p>
+                  </div>
+                  <Button onClick={handleNewChat}>
+                    <MessageSquarePlus className="mr-2 h-4 w-4" />
+                    Start New Chat
+                  </Button>
                 </div>
               </div>
+            ) : messages.length === 0 ? (
+              <div className="flex h-[calc(100vh-12rem)] flex-col items-center justify-center text-center">
+                <div className="mx-auto flex max-w-md flex-col items-center space-y-4">
+                  <div className="rounded-full bg-primary/10 p-3">
+                    <MessageSquarePlus className="h-6 w-6 text-primary" />
+                  </div>
+                  <div className="space-y-2">
+                    <h2 className="text-lg font-semibold">No messages yet</h2>
+                    <p className="text-sm text-muted-foreground">
+                      Start by asking a question about your studies
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <>
+                {messages.map((message, index) => (
+                  <Message
+                    key={message.id}
+                    message={message}
+                    onFeedback={async (messageId, isPositive) => {
+                      // Implement feedback handling here
+                      console.log('Feedback:', messageId, isPositive);
+                    }}
+                  />
+                ))}
+                {/* Typing indicator */}
+                {isTyping && (
+                  <div className="flex w-full items-start gap-3 px-4">
+                    <Avatar className="h-8 w-8 border border-border">
+                      <AvatarFallback className="bg-gradient-to-br from-indigo-500 to-purple-500 text-white text-xs font-medium">
+                        AI
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex max-w-3xl items-center space-x-4 rounded-lg bg-muted/50 px-4 py-3 text-sm shadow-sm border border-border/50">
+                      <div className="flex space-x-2">
+                        <div className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/50 [animation-delay:0ms]" />
+                        <div className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/50 [animation-delay:150ms]" />
+                        <div className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/50 [animation-delay:300ms]" />
+                      </div>
+                      <span className="text-muted-foreground">AI is thinking...</span>
+                    </div>
+                  </div>
+                )}
+              </>
             )}
-          </>
-        )}
+          </div>
+        </ScrollArea>
       </div>
 
       {(isNewChat || chatId) && (
-        <div className="border-t p-4">
-          <form onSubmit={handleSubmit} className="flex gap-2">
-            <input
-              type="text"
-              value={question}
-              onChange={(e) => setQuestion(e.target.value)}
-              placeholder="Type your question..."
-              className="flex-1 rounded-md border border-input bg-background px-3 py-2"
-              disabled={loading}
-            />
+        <div className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 py-4">
+          <form onSubmit={handleSubmit} className="mx-auto flex max-w-3xl gap-2">
+            <div className="relative flex-1">
+              <textarea
+                value={question}
+                onChange={(e) => {
+                  setQuestion(e.target.value);
+                  e.target.style.height = 'auto';
+                  e.target.style.height = `${e.target.scrollHeight}px`;
+                }}
+                placeholder="Type your question..."
+                className="min-h-[44px] w-full resize-none rounded-md border border-input bg-background px-3 py-2 pr-12 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                disabled={loading}
+                rows={1}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    if (question.trim() && !loading) {
+                      handleSubmit(e as any);
+                    }
+                  }
+                }}
+              />
+              <div className="absolute bottom-2 right-2 text-xs text-muted-foreground">
+                Press <kbd className="rounded border px-1 bg-muted">⏎</kbd> to send
+              </div>
+            </div>
             <Button type="submit" disabled={loading || !question.trim()}>
               {loading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
