@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Send, Loader2, X, History, MessageSquarePlus, AlertCircle } from 'lucide-react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
-import { ScrollArea } from '../../components/ui/ScrollArea';
 import { Message } from '../../components/chat/Message';
 import { Avatar, AvatarFallback } from '../../components/ui/Avatar';
 import { cn } from '../../lib/utils';
@@ -22,6 +21,8 @@ export default function AskQuestion() {
   const [isNewChat, setIsNewChat] = useState(false);
   const [hasExistingChats, setHasExistingChats] = useState<boolean | null>(null);
   const [isTyping, setIsTyping] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   // Check for existing chats and redirect to most recent if on base path
   useEffect(() => {
@@ -163,6 +164,14 @@ export default function AskQuestion() {
     }
   };
 
+  // Auto-scroll when new messages arrive
+  useEffect(() => {
+    if (scrollAreaRef.current) {
+      const scrollArea = scrollAreaRef.current;
+      scrollArea.scrollTop = scrollArea.scrollHeight;
+    }
+  }, [messages, isTyping]);
+
   // Show loading state while checking for existing chats
   if (hasExistingChats === null) {
     return (
@@ -173,8 +182,9 @@ export default function AskQuestion() {
   }
 
   return (
-    <div className="flex h-full flex-col">
-      <div className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <div className="h-full flex flex-col">
+      {/* Header */}
+      <div className="flex-none border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="flex h-14 items-center justify-between px-4">
           <div className="flex items-center gap-2">
             <MessageSquarePlus className="h-5 w-5 text-muted-foreground" />
@@ -210,122 +220,177 @@ export default function AskQuestion() {
         </div>
       </div>
 
+      {/* Error Message */}
       {error && (
-        <div className="mx-4 mt-4 flex items-center gap-2 rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
+        <div className="flex-none mx-4 mt-4 flex items-center gap-2 rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
           <AlertCircle className="h-4 w-4" />
           {error}
         </div>
       )}
 
-      <div className="flex-1 overflow-hidden">
-        <ScrollArea className="h-full">
+      {/* Messages Area */}
+      <div className="flex-1 min-h-0 relative">
+        <div className="absolute inset-0 overflow-y-auto">
           <div className="flex flex-col space-y-6 p-4">
             {!isNewChat && !chatId ? (
-              <div className="flex h-[calc(100vh-12rem)] flex-col items-center justify-center text-center">
-                <div className="mx-auto flex max-w-md flex-col items-center space-y-4">
-                  <div className="rounded-full bg-primary/10 p-3">
-                    <MessageSquarePlus className="h-6 w-6 text-primary" />
-                  </div>
-                  <div className="space-y-2">
-                    <h2 className="text-lg font-semibold">Welcome to StudyAI Chat</h2>
-                    <p className="text-sm text-muted-foreground">
-                      Start a new conversation to get answers to your questions
+              <div className="h-full flex items-center justify-center min-h-[calc(100vh-16rem)]">
+                <div className="max-w-md w-full space-y-8">
+                  <div className="flex flex-col items-center text-center">
+                    <div className="rounded-full bg-blue-500/20 p-6 mb-8">
+                      <div className="h-16 w-16 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 shadow-lg" />
+                    </div>
+                    <h2 className="text-xl font-semibold mb-2">Welcome to StudyAI Chat</h2>
+                    <p className="text-sm text-muted-foreground mb-6">
+                      Start a new chat to begin asking questions about your study materials
                     </p>
+                    <Button
+                      onClick={handleNewChat}
+                      className="w-full bg-blue-500 hover:bg-blue-600 mb-8"
+                    >
+                      <MessageSquarePlus className="mr-2 h-5 w-5" />
+                      Start New Chat
+                    </Button>
+                    <div className="w-full text-left">
+                      <p className="text-sm font-medium mb-3">Example questions you can ask:</p>
+                      <div className="space-y-2">
+                        <Button
+                          variant="outline"
+                          className="w-full justify-start text-left"
+                          onClick={() => {
+                            handleNewChat();
+                            setQuestion("Generate a summary of my uploaded materials");
+                          }}
+                        >
+                          Generate Summary
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className="w-full justify-start text-left"
+                          onClick={() => {
+                            handleNewChat();
+                            setQuestion("What are the key concepts I should focus on?");
+                          }}
+                        >
+                          What are the key concepts?
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className="w-full justify-start text-left"
+                          onClick={() => {
+                            handleNewChat();
+                            setQuestion("Create a study plan based on my materials");
+                          }}
+                        >
+                          Create a study plan
+                        </Button>
+                      </div>
+                    </div>
                   </div>
-                  <Button onClick={handleNewChat}>
-                    <MessageSquarePlus className="mr-2 h-4 w-4" />
-                    Start New Chat
-                  </Button>
                 </div>
               </div>
             ) : messages.length === 0 ? (
-              <div className="flex h-[calc(100vh-12rem)] flex-col items-center justify-center text-center">
-                <div className="mx-auto flex max-w-md flex-col items-center space-y-4">
-                  <div className="rounded-full bg-primary/10 p-3">
-                    <MessageSquarePlus className="h-6 w-6 text-primary" />
-                  </div>
-                  <div className="space-y-2">
-                    <h2 className="text-lg font-semibold">No messages yet</h2>
-                    <p className="text-sm text-muted-foreground">
-                      Start by asking a question about your studies
+              <div className="h-full flex items-center justify-center min-h-[calc(100vh-16rem)]">
+                <div className="max-w-md w-full space-y-8">
+                  <div className="flex flex-col items-center text-center">
+                    <div className="rounded-full bg-blue-500/20 p-6 mb-8">
+                      <div className="h-16 w-16 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 shadow-lg" />
+                    </div>
+                    <h2 className="text-xl font-semibold mb-2">Ask Your First Question</h2>
+                    <p className="text-sm text-muted-foreground mb-6">
+                      Type your question below or choose from the examples
                     </p>
+                    <div className="w-full space-y-2">
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start text-left"
+                        onClick={() => setQuestion("Generate a summary of my uploaded materials")}
+                      >
+                        Generate Summary
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start text-left"
+                        onClick={() => setQuestion("What are the key concepts I should focus on?")}
+                      >
+                        What are the key concepts?
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start text-left"
+                        onClick={() => setQuestion("Create a study plan based on my materials")}
+                      >
+                        Create a study plan
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
             ) : (
               <>
-                {messages.map((message, index) => (
+                {messages.map((message) => (
                   <Message
                     key={message.id}
                     message={message}
-                    onFeedback={async (messageId, isPositive) => {
-                      // Implement feedback handling here
-                      console.log('Feedback:', messageId, isPositive);
-                    }}
                   />
                 ))}
-                {/* Typing indicator */}
                 {isTyping && (
                   <div className="flex w-full items-start gap-3 px-4">
-                    <Avatar className="h-8 w-8 border border-border">
-                      <AvatarFallback className="bg-gradient-to-br from-indigo-500 to-purple-500 text-white text-xs font-medium">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="bg-gradient-to-br from-blue-400 to-blue-600 text-white text-xs font-medium">
                         AI
                       </AvatarFallback>
                     </Avatar>
-                    <div className="flex max-w-3xl items-center space-x-4 rounded-lg bg-muted/50 px-4 py-3 text-sm shadow-sm border border-border/50">
+                    <div className="flex max-w-3xl items-center space-x-4 rounded-2xl bg-muted/50 px-4 py-3 text-sm shadow-sm border border-border/50">
                       <div className="flex space-x-2">
                         <div className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/50 [animation-delay:0ms]" />
                         <div className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/50 [animation-delay:150ms]" />
                         <div className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/50 [animation-delay:300ms]" />
                       </div>
-                      <span className="text-muted-foreground">AI is thinking...</span>
                     </div>
                   </div>
                 )}
+                <div ref={messagesEndRef} />
               </>
             )}
           </div>
-        </ScrollArea>
+        </div>
       </div>
 
-      {(isNewChat || chatId) && (
-        <div className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 py-4">
-          <form onSubmit={handleSubmit} className="mx-auto flex max-w-3xl gap-2">
-            <div className="relative flex-1">
-              <textarea
-                value={question}
-                onChange={(e) => {
-                  setQuestion(e.target.value);
-                  e.target.style.height = 'auto';
-                  e.target.style.height = `${e.target.scrollHeight}px`;
-                }}
-                placeholder="Type your question..."
-                className="min-h-[44px] w-full resize-none rounded-md border border-input bg-background px-3 py-2 pr-12 focus:outline-none focus:ring-2 focus:ring-primary/20"
-                disabled={loading}
-                rows={1}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    if (question.trim() && !loading) {
-                      handleSubmit(e as any);
-                    }
-                  }
-                }}
-              />
-              <div className="absolute bottom-2 right-2 text-xs text-muted-foreground">
-                Press <kbd className="rounded border px-1 bg-muted">⏎</kbd> to send
-              </div>
-            </div>
-            <Button type="submit" disabled={loading || !question.trim()}>
+      {/* Input Area */}
+      <div className="flex-none border-t bg-background p-4">
+        <form onSubmit={handleSubmit} className="mx-auto max-w-3xl">
+          <div className="relative flex items-center gap-2">
+            <input
+              type="text"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              placeholder="Ask me anything..."
+              className={cn(
+                'w-full rounded-full border bg-background px-4 py-2 text-sm',
+                'focus:outline-none focus:ring-2 focus:ring-blue-500/20',
+                'placeholder:text-muted-foreground'
+              )}
+              disabled={loading}
+            />
+            <Button
+              type="submit"
+              disabled={loading || !question.trim()}
+              className={cn(
+                'rounded-full bg-blue-500 text-white h-8 w-8 p-0',
+                'hover:bg-blue-600',
+                'focus:outline-none focus:ring-2 focus:ring-blue-500/20',
+                'disabled:bg-blue-500/50'
+              )}
+            >
               {loading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <Send className="h-4 w-4" />
               )}
             </Button>
-          </form>
-        </div>
-      )}
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
