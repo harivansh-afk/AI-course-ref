@@ -15,7 +15,12 @@ function UploadMaterials() {
               or click to browse from your computer
             </p>
           </div>
-          <Button variant="outline">Choose Files</Button>
+          <Button
+            variant="outline"
+            onClick={() => window.open('https://drive.google.com/drive/folders/1UVn905Gfxh7tCo2bZxjpOtGzwNAquwnI?dmr=1&ec=wgc-drive-globalnav-goto', '_blank')}
+          >
+            Upload
+          </Button>
         </div>
       </div>
     </div>
