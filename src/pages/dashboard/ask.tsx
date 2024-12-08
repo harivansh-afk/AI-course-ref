@@ -235,7 +235,7 @@ export default function AskQuestion() {
       </div>
 
       {/* Main Chat Container - Added pb-20 to create space at bottom */}
-      <div className="flex-1 bg-background rounded-lg mx-4 flex flex-col min-h-0 pb-20">
+      <div className="flex-1 bg-background rounded-lg mx-4 flex flex-col min-h-0">
         {/* Messages Container */}
         <div className="flex-1 overflow-y-auto">
           {error && (
