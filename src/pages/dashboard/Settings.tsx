@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card } from '../../components/ui/card';
 import { Label } from '../../components/ui/label';
-import { Switch } from '../../components/ui/Switch';
+import { switch } from '../../components/ui/switch';
 import { useTheme } from '../../contexts/ThemeContext';
 import { Button } from '../../components/ui/Button';
 import { supabase } from '../../lib/supabase';
@@ -58,7 +58,7 @@ function Settings() {
               <Label>Dark Mode</Label>
               <p className="text-sm text-muted-foreground">Enable dark color theme</p>
             </div>
-            <Switch
+            <switch
               checked={isDarkMode}
               onCheckedChange={toggleDarkMode}
               className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-purple-400 data-[state=checked]:to-purple-500"
