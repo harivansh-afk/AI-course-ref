@@ -16,7 +16,7 @@ const sidebarItems = [
   },
   {
     icon: History,
-    label: 'Study History',
+    label: 'Chat History',
     path: '/dashboard/history'
   },
   {
