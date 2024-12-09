@@ -1,25 +1,27 @@
-# RAG-UI
+# AI Agent App
 
-A modern web application for Retrieval-Augmented Generation (RAG) that leverages AI to provide intelligent document-based chat interactions. Built with React, TypeScript, and a powerful n8n backend for RAG processing.
+A cutting-edge AI-powered application designed to simplify and supercharge your daily workflows. This intelligent agent seamlessly handles email automation, conducts precise web searches, and retrieves relevant files from Google Drive to provide personalized and context-aware responses. With a modern UI, robust backend processing, and secure authentication, the AI Agent App is your ultimate assistant for productivity and efficiency.
 
 ## 🌟 Features
 
-- **AI-Powered Chat**: Advanced RAG system processing 1000+ queries with 90% relevance rate
-- **High Performance**: Optimized client-side architecture with 40% reduced API calls
-- **Intelligent Retrieval**: Context-aware document search with 95% query response accuracy
-- **Secure Authentication**: Zero-breach security with Supabase authentication
-- **Modern Tech Stack**: React 18, TypeScript, Vite, and Tailwind CSS
-- **Real-time Updates**: Instant message delivery with optimized local storage
-- **Responsive Design**: Fluid UI built with Radix UI components
-- **Type Safety**: Full TypeScript support throughout the application
+- **AI Task Automation**: Handles complex tasks like email composition, web search, and file retrieval.
+- **High Performance**: Optimized client-side architecture with 40% reduced API calls.
+- **Context-Aware Retrieval**: Dynamically accesses and references Google Drive files.
+- **Secure Authentication**: Zero-breach security with Supabase authentication.
+- **Modern Tech Stack**: React 18, TypeScript, Vite, and Tailwind CSS.
+- **Real-Time Updates**: Instant task execution feedback with optimized local storage.
+- **Responsive Design**: Fluid UI built with Radix UI components.
+- **Type Safety**: Full TypeScript support throughout the application.
 
 ## 🧠 AI Capabilities
 
-- **Document Processing**: Efficient handling of various document formats
-- **Context Retention**: Maintains conversation context for more relevant responses
-- **Source Attribution**: Transparent source referencing for retrieved information
-- **Relevance Scoring**: AI-powered ranking of retrieved documents
-- **Query Optimization**: Intelligent query preprocessing for better results
+- **Email Automation**: Generates and sends professional emails tailored to user needs.
+- **Web Search**: Conducts intelligent searches and summarizes results.
+- **Google Drive Integration**: Retrieves and uses files as references for contextual responses.
+- **Context Retention**: Maintains conversation history for seamless task execution.
+- **Source Attribution**: Transparent referencing of retrieved information.
+- **Relevance Scoring**: AI-powered ranking of search results and file content.
+- **Query Optimization**: Intelligent preprocessing for better task execution.
 
 ## 🚀 Getting Started
 
@@ -27,8 +29,9 @@ A modern web application for Retrieval-Augmented Generation (RAG) that leverages
 
 - Node.js (v18 or higher)
 - npm or yarn
-- n8n instance for RAG processing
+- n8n instance for task processing
 - Supabase account
+- Google Drive API credentials
 
 ### Environment Variables
 
@@ -38,79 +41,87 @@ Create a `.env` file in the root directory:
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 VITE_N8N_WEBHOOK_URL=your_n8n_webhook_url
+VITE_GOOGLE_API_KEY=your_google_api_key
+VITE_GOOGLE_DRIVE_FOLDER_ID=your_drive_folder_id
 ```
 
 ### Quick Start
 
 1. Clone and setup:
 
-```bash
-git clone https://github.com/yourusername/RAG-ui.git
-cd RAG-ui
-npm install
-```
+   ```bash
+   git clone https://github.com/yourusername/ai-agent-app.git
+   cd ai-agent-app
+   npm install
+   ```
 
 2. Start development:
 
-```bash
-npm run dev
-```
+   ```bash
+   npm run dev
+   ```
 
 ## 🏗️ Technical Architecture
 
 ### Frontend Architecture
 
-- **React 18**: Latest features including concurrent rendering
-- **TypeScript**: Strong type safety across the application
-- **Vite**: Lightning-fast build tooling
-- **Tailwind CSS**: Utility-first styling
-- **Radix UI**: Accessible component library
+- **React 18**: Latest features including concurrent rendering.
+- **TypeScript**: Strong type safety across the application.
+- **Vite**: Lightning-fast build tooling.
+- **Tailwind CSS**: Utility-first styling.
+- **Radix UI**: Accessible component library.
 
 ### Backend Services
 
-- **n8n RAG Processing**:
-  - Document indexing and retrieval
-  - Context-aware search
-  - Response generation
+- **n8n Task Processing**:
+  - Email automation.
+  - Web search.
+  - File retrieval and reference.
+  - Response generation.
 - **Supabase Integration**:
-  - Secure authentication
-  - Session management
-  - Protected routes
+  - Secure authentication.
+  - Session management.
+  - Protected routes.
+- **Google Drive API**:
+  - File indexing and retrieval.
+  - Context-aware integration.
 - **Local Storage Optimization**:
-  - Efficient chat persistence
-  - Reduced API calls
-  - Optimized performance
+  - Efficient chat/task persistence.
+  - Reduced API calls.
+  - Optimized performance.
 
 ### Data Flow
 
-1. User sends query through secure channel
-2. Query processed by n8n RAG system
-3. Relevant documents retrieved and ranked
-4. AI-generated response with source attribution
-5. Real-time UI updates with optimized storage
+1. User submits a task request (email, search, file retrieval) through a secure channel.
+2. Task processed by n8n system.
+3. Relevant data retrieved, processed, and integrated.
+4. AI-generated results with source attribution.
+5. Real-time UI updates with optimized storage.
 
-## 💬 Chat System Features
+## 💬 AI Task Automation Features
 
-- **Real-time Processing**: Instant message handling
-- **Context Awareness**: Maintains conversation history
-- **Source Attribution**: Links responses to documents
-- **Error Handling**: Graceful fallbacks
-- **Performance Optimization**: Local storage caching
-- **Type Safety**: Full TypeScript integration
+- **Email Handling**: Compose and send context-aware emails.
+- **Web Search**: Conduct targeted searches and summarize results.
+- **File Retrieval**: Fetch and integrate Google Drive files for responses.
+- **Context Awareness**: Maintains task history for seamless operation.
+- **Error Handling**: Graceful fallbacks for failed tasks.
+- **Performance Optimization**: Local storage caching.
+- **Type Safety**: Full TypeScript integration.
 
 ## 🛠️ Development
 
 ### Available Scripts
 
-- `npm run dev`: Development server
-- `npm run build`: Production build
-- `npm run preview`: Preview build
-- `npm run lint`: Code linting
+- `npm run dev`: Development server.
+- `npm run build`: Production build.
+- `npm run preview`: Preview build.
+- `npm run lint`: Code linting.
 
 ### Performance Metrics
 
-- 95% query response accuracy
-- 40% reduction in API calls
-- 90% document retrieval relevance
-- Zero security breaches
-- Sub-second response times
+- Sub-second task execution.
+- 95% task accuracy.
+- 40% reduction in API calls.
+- Zero security breaches.
+- Seamless file retrieval and integration.
+```
