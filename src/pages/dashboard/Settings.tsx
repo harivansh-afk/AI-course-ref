@@ -1,179 +1,89 @@
 import React, { useState } from 'react';
 import { Card } from '../../components/ui/card';
 import { Label } from '../../components/ui/label';
-import { Switch } from '../../components/ui/switch';
-import { Slider } from '../../components/ui/slider';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
+import { Switch } from '../../components/ui/Switch';
 import { useTheme } from '../../contexts/ThemeContext';
+import { Button } from '../../components/ui/Button';
+import { supabase } from '../../lib/supabase';
+import { Trash2 } from 'lucide-react';
 
 function Settings() {
-  // Chat & RAG Settings
-  const [retainContext, setRetainContext] = useState(true);
-  const [contextWindowSize, setContextWindowSize] = useState(10);
-  const [showSourceAttribution, setShowSourceAttribution] = useState(true);
-  const [relevanceThreshold, setRelevanceThreshold] = useState(0.8);
-
-  // UI Settings
   const { isDarkMode, toggleDarkMode } = useTheme();
-  const [messageGrouping, setMessageGrouping] = useState(true);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  // Privacy Settings
-  const [saveHistory, setSaveHistory] = useState(true);
-  const [anonymizeData, setAnonymizeData] = useState(false);
-  const [shareAnalytics, setShareAnalytics] = useState(true);
+  const handleDeleteResources = async () => {
+    // Add confirmation dialog
+    const confirmed = window.confirm(
+      'Are you sure you want to delete all resources? This action cannot be undone.'
+    );
 
-  const handleSliderChange = (values: number[]): number => {
-    return values[0];
+    if (!confirmed) return;
+
+    try {
+      setIsDeleting(true);
+
+      // Delete all records from documents table
+      const { error: documentsError } = await supabase
+        .from('documents')
+        .delete()
+        .neq('id', '0'); // Delete all records
+
+      if (documentsError) throw documentsError;
+
+      // Delete all records from n8n_chat_histories table
+      const { error: chatHistoryError } = await supabase
+        .from('n8n_chat_histories')
+        .delete()
+        .neq('id', '0'); // Delete all records
+
+      if (chatHistoryError) throw chatHistoryError;
+
+      alert('All resources have been deleted successfully');
+    } catch (error) {
+      console.error('Error deleting resources:', error);
+      alert('Failed to delete resources. Please try again.');
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   return (
     <div className="space-y-6 p-6">
       <h1 className="text-3xl font-bold">Settings</h1>
 
-      <Tabs defaultValue="chat" className="w-full">
-        <TabsList className="mb-4 bg-muted">
-          <TabsTrigger
-            value="chat"
-            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-400 data-[state=active]:to-purple-500 data-[state=active]:text-white"
-          >
-            Chat & RAG
-          </TabsTrigger>
-          <TabsTrigger
-            value="ui"
-            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-400 data-[state=active]:to-purple-500 data-[state=active]:text-white"
-          >
-            UI
-          </TabsTrigger>
-          <TabsTrigger
-            value="privacy"
-            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-400 data-[state=active]:to-purple-500 data-[state=active]:text-white"
-          >
-            Privacy
-          </TabsTrigger>
-        </TabsList>
+      <div className="space-y-6">
+        <Card className="p-6 space-y-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <Label>Dark Mode</Label>
+              <p className="text-sm text-muted-foreground">Enable dark color theme</p>
+            </div>
+            <Switch
+              checked={isDarkMode}
+              onCheckedChange={toggleDarkMode}
+              className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-purple-400 data-[state=checked]:to-purple-500"
+            />
+          </div>
 
-        <TabsContent value="chat">
-          <Card className="p-6 space-y-6">
-            <div className="flex items-center justify-between">
+          <div className="border-t border-border pt-6">
+            <div className="space-y-4">
               <div>
-                <Label>Context Retention</Label>
-                <p className="text-sm text-muted-foreground">Keep conversation context for more relevant responses</p>
+                <Label className="text-destructive">Danger Zone</Label>
+                <p className="text-sm text-muted-foreground">Delete all resources from the database</p>
               </div>
-              <Switch
-                checked={retainContext}
-                onCheckedChange={setRetainContext}
-                className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-purple-400 data-[state=checked]:to-purple-500"
-              />
+              <Button
+                variant="destructive"
+                onClick={handleDeleteResources}
+                disabled={isDeleting}
+                className="w-full flex items-center justify-center gap-2"
+              >
+                <Trash2 className="h-4 w-4" />
+                {isDeleting ? 'Deleting...' : 'Delete All Resources'}
+              </Button>
             </div>
-
-            <div className="space-y-2">
-              <Label>Context Window Size</Label>
-              <p className="text-sm text-muted-foreground">Number of previous messages to consider (1-20)</p>
-              <Slider
-                value={[contextWindowSize]}
-                onValueChange={(values: number[]) => setContextWindowSize(handleSliderChange(values))}
-                max={20}
-                min={1}
-                step={1}
-                className="[&_.SliderTrack]:bg-purple-200 [&_.SliderRange]:bg-gradient-to-r [&_.SliderRange]:from-purple-400 [&_.SliderRange]:to-purple-500 [&_.SliderThumb]:border-purple-400"
-              />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div>
-                <Label>Source Attribution</Label>
-                <p className="text-sm text-muted-foreground">Show source documents for responses</p>
-              </div>
-              <Switch
-                checked={showSourceAttribution}
-                onCheckedChange={setShowSourceAttribution}
-                className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-purple-400 data-[state=checked]:to-purple-500"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label>Relevance Threshold</Label>
-              <p className="text-sm text-muted-foreground">Minimum relevance score for document retrieval (0-1)</p>
-              <Slider
-                value={[relevanceThreshold]}
-                onValueChange={(values: number[]) => setRelevanceThreshold(handleSliderChange(values))}
-                max={1}
-                min={0}
-                step={0.1}
-                className="[&_.SliderTrack]:bg-purple-200 [&_.SliderRange]:bg-gradient-to-r [&_.SliderRange]:from-purple-400 [&_.SliderRange]:to-purple-500 [&_.SliderThumb]:border-purple-400"
-              />
-            </div>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="ui">
-          <Card className="p-6 space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label>Dark Mode</Label>
-                <p className="text-sm text-muted-foreground">Enable dark color theme</p>
-              </div>
-              <Switch
-                checked={isDarkMode}
-                onCheckedChange={toggleDarkMode}
-                className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-purple-400 data-[state=checked]:to-purple-500"
-              />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div>
-                <Label>Message Grouping</Label>
-                <p className="text-sm text-muted-foreground">Group consecutive messages from the same source</p>
-              </div>
-              <Switch
-                checked={messageGrouping}
-                onCheckedChange={setMessageGrouping}
-                className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-purple-400 data-[state=checked]:to-purple-500"
-              />
-            </div>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="privacy">
-          <Card className="p-6 space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label>Save Chat History</Label>
-                <p className="text-sm text-muted-foreground">Store conversation history locally</p>
-              </div>
-              <Switch
-                checked={saveHistory}
-                onCheckedChange={setSaveHistory}
-                className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-purple-400 data-[state=checked]:to-purple-500"
-              />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div>
-                <Label>Anonymize Data</Label>
-                <p className="text-sm text-muted-foreground">Remove personal information from logs</p>
-              </div>
-              <Switch
-                checked={anonymizeData}
-                onCheckedChange={setAnonymizeData}
-                className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-purple-400 data-[state=checked]:to-purple-500"
-              />
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div>
-                <Label>Share Analytics</Label>
-                <p className="text-sm text-muted-foreground">Help improve the app by sharing usage data</p>
-              </div>
-              <Switch
-                checked={shareAnalytics}
-                onCheckedChange={setShareAnalytics}
-                className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-purple-400 data-[state=checked]:to-purple-500"
-              />
-            </div>
-          </Card>
-        </TabsContent>
-      </Tabs>
+          </div>
+        </Card>
+      </div>
     </div>
   );
 }
