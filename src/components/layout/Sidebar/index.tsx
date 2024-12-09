@@ -43,7 +43,7 @@ const Sidebar = () => {
 
   return (
     <div className="w-64 shrink-0">
-      <div className="rounded-2xl bg-background border shadow-sm h-full p-4">
+      <div className="rounded-2xl bg-background/70 backdrop-blur-lg shadow-lg h-full p-4">
         <nav className="space-y-2">
           {sidebarItems.map((item) => {
             const Icon = item.icon;

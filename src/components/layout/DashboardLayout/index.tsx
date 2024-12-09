@@ -9,7 +9,7 @@ const DashboardLayout = () => {
       <Header />
       <div className="flex flex-1 overflow-hidden gap-6 p-6 pt-24">
         <Sidebar />
-        <main className="flex-1 rounded-2xl bg-background shadow-sm border overflow-hidden">
+        <main className="flex-1 rounded-2xl bg-background shadow-sm overflow-hidden">
           <div className="h-full">
             <Outlet />
           </div>
