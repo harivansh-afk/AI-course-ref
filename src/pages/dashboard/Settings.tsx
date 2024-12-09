@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card } from '../../components/ui/card';
 import { Label } from '../../components/ui/label';
-import { switch } from '../../components/ui/switch';
+import { Switch } from '../../components/ui/Switch';
 import { useTheme } from '../../contexts/ThemeContext';
 import { Button } from '../../components/ui/Button';
 import { supabase } from '../../lib/supabase';
