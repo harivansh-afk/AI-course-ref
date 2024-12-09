@@ -37,12 +37,27 @@ function extractCitations(content: string): { cleanContent: string; citations: C
   return { cleanContent, citations };
 }
 
+function extractUsedTool(content: string): { cleanContent: string; usedTools: string[] } {
+  const usedToolRegex = /^\*\*Used Tool(?:s)?: ([^*]+)\*\*\n\n/;
+  const match = content.match(usedToolRegex);
+
+  if (match) {
+    const usedToolsString = match[1];
+    const usedTools = usedToolsString.split(',').map(tool => tool.trim());
+    const cleanContent = content.replace(usedToolRegex, '');
+    return { cleanContent, usedTools };
+  }
+
+  return { cleanContent: content, usedTools: [] };
+}
+
 export function Message({ message }: MessageProps) {
   const [copied, setCopied] = React.useState(false);
   const [messageCopied, setMessageCopied] = React.useState(false);
   const [isLiked, setIsLiked] = React.useState(false);
   const [isDisliked, setIsDisliked] = React.useState(false);
   const { cleanContent, citations } = extractCitations(message.content);
+  const { cleanContent: finalContent, usedTools } = extractUsedTool(cleanContent);
 
   const handleCopy = async (text: string) => {
     await navigator.clipboard.writeText(text);
@@ -175,7 +190,7 @@ export function Message({ message }: MessageProps) {
             )}
             components={components}
           >
-            {cleanContent}
+            {finalContent}
           </ReactMarkdown>
 
           {message.role === 'assistant' && citations.length > 0 && (
@@ -191,6 +206,26 @@ export function Message({ message }: MessageProps) {
                     <LinkIcon className="h-3 w-3 mt-0.5 text-muted-foreground/70" />
                     <span className="text-muted-foreground/70 group-hover/citation:text-foreground/90 transition-colors">
                       {citation.text} - <span className="text-foreground/90 underline-offset-4 group-hover/citation:underline">{citation.source}</span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+          {message.role === 'assistant' && usedTools.length > 0 && (
+            <>
+              <Separator className="my-4 opacity-30" />
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground/80">
+                  <BookOpen className="h-4 w-4" />
+                  Used Tools
+                </div>
+                {usedTools.map((tool, index) => (
+                  <div key={index} className="flex items-start gap-2 text-xs">
+                    <LinkIcon className="h-3 w-3 mt-0.5 text-muted-foreground/70" />
+                    <span className="text-muted-foreground/70">
+                      {tool}
                     </span>
                   </div>
                 ))}
