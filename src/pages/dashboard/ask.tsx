@@ -252,9 +252,9 @@ export default function AskQuestion() {
                     <div className="rounded-full bg-purple-500/20 p-6 mb-8">
                       <div className="h-16 w-16 rounded-full bg-gradient-to-br from-purple-300 to-purple-500 shadow-lg" />
                     </div>
-                    <h2 className="text-xl font-semibold mb-2">Welcome to StudyAI Chat</h2>
+                    <h2 className="text-xl font-semibold mb-2">Welcome to your AI AGENT</h2>
                     <p className="text-sm text-muted-foreground mb-6">
-                      Start a new chat to begin asking questions about your study materials
+                      Start a new chat to begin automating your tasks
                     </p>
                     <Button
                       onClick={handleNewChat}
@@ -264,7 +264,7 @@ export default function AskQuestion() {
                       Start New Chat
                     </Button>
                     <div className="w-full text-left">
-                      <p className="text-sm font-medium mb-3">Example questions you can ask:</p>
+                      <p className="text-sm font-medium mb-3">Current Tools:</p>
                       <div className="space-y-2">
                         <Button
                           variant="outline"
@@ -274,7 +274,7 @@ export default function AskQuestion() {
                             setQuestion("Generate a summary of my uploaded materials");
                           }}
                         >
-                          Generate Summary
+                          Email Assistant
                         </Button>
                         <Button
                           variant="outline"
@@ -284,7 +284,7 @@ export default function AskQuestion() {
                             setQuestion("What are the key concepts I should focus on?");
                           }}
                         >
-                          What are the key concepts?
+                          Research Assistant
                         </Button>
                         <Button
                           variant="outline"
@@ -294,7 +294,7 @@ export default function AskQuestion() {
                             setQuestion("Create a study plan based on my materials");
                           }}
                         >
-                          Create a study plan
+                          Vector Database Assistant
                         </Button>
                       </div>
                     </div>
@@ -318,21 +318,21 @@ export default function AskQuestion() {
                         className="w-full justify-start text-left"
                         onClick={() => setQuestion("Generate a summary of my uploaded materials")}
                       >
-                        Generate Summary
+                        Email Assistant
                       </Button>
                       <Button
                         variant="outline"
                         className="w-full justify-start text-left"
                         onClick={() => setQuestion("What are the key concepts I should focus on?")}
                       >
-                        What are the key concepts?
+                        Research Assistant
                       </Button>
                       <Button
                         variant="outline"
                         className="w-full justify-start text-left"
                         onClick={() => setQuestion("Create a study plan based on my materials")}
                       >
-                        Create a study plan
+                        Vector Database Assistant
                       </Button>
                     </div>
                   </div>

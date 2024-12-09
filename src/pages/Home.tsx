@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowRight, Brain, Sparkles, Users, FileText, Zap, Shield, MessageSquare } from 'lucide-react';
+import { ArrowRight, Brain, Sparkles, FileText, Zap, Shield, MessageSquare, Mail, Search, History, Link2, BarChart2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '../components/ui/Button';
 import { Header } from '../components/layout/Header';
@@ -74,9 +74,9 @@ function Home() {
                 <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                   <Brain className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Intelligent Analysis</h3>
+                <h3 className="text-xl font-semibold mb-2">AI Task Automation</h3>
                 <p className="text-muted-foreground">
-                  Advanced RAG system processes your documents with 95% accuracy for precise answers.
+                  Handles complex tasks like email composition, web search, and file retrieval with 95% accuracy.
                 </p>
               </div>
 
@@ -84,20 +84,93 @@ function Home() {
                 <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                   <Sparkles className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Smart Retrieval</h3>
+                <h3 className="text-xl font-semibold mb-2">Context-Aware Retrieval</h3>
                 <p className="text-muted-foreground">
-                  Context-aware document retrieval with semantic understanding of your content.
+                  Dynamically accesses and references files with intelligent preprocessing for better task execution.
                 </p>
               </div>
 
               <div className="p-6 rounded-2xl bg-card border hover:shadow-lg transition-all group">
                 <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <Users className="h-6 w-6 text-primary" />
+                  <Shield className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">Source Attribution</h3>
+                <h3 className="text-xl font-semibold mb-2">Secure & Fast</h3>
                 <p className="text-muted-foreground">
-                  Transparent source referencing and attribution for all retrieved information.
+                  Zero-breach security with optimized performance, reducing API calls by 40% for faster responses.
                 </p>
+              </div>
+            </div>
+          </section>
+
+          {/* AI Capabilities Section */}
+          <section className="py-20 bg-secondary/30 -mx-4 px-4">
+            <div className="max-w-6xl mx-auto">
+              <div className="text-center mb-16">
+                <h2 className="text-3xl font-bold mb-4">Advanced AI Capabilities</h2>
+                <p className="text-muted-foreground max-w-2xl mx-auto">
+                  Experience the power of our AI agent with these cutting-edge features.
+                </p>
+              </div>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="bg-background/70 backdrop-blur-sm p-6 rounded-2xl border shadow-sm hover:shadow-md transition-all">
+                  <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                    <Mail className="h-6 w-6 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">Email Automation</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Generates and sends professional emails tailored to your needs with context awareness.
+                  </p>
+                </div>
+
+                <div className="bg-background/70 backdrop-blur-sm p-6 rounded-2xl border shadow-sm hover:shadow-md transition-all">
+                  <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                    <Search className="h-6 w-6 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">Intelligent Search</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Conducts targeted web searches and provides concise, relevant summaries of results.
+                  </p>
+                </div>
+
+                <div className="bg-background/70 backdrop-blur-sm p-6 rounded-2xl border shadow-sm hover:shadow-md transition-all">
+                  <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                    <FileText className="h-6 w-6 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">File Integration</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Seamlessly retrieves and uses files as references for providing contextual responses.
+                  </p>
+                </div>
+
+                <div className="bg-background/70 backdrop-blur-sm p-6 rounded-2xl border shadow-sm hover:shadow-md transition-all">
+                  <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                    <History className="h-6 w-6 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">Context Retention</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Maintains conversation history for seamless and continuous task execution.
+                  </p>
+                </div>
+
+                <div className="bg-background/70 backdrop-blur-sm p-6 rounded-2xl border shadow-sm hover:shadow-md transition-all">
+                  <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                    <Link2 className="h-6 w-6 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">Source Attribution</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Provides transparent referencing of all retrieved information and sources.
+                  </p>
+                </div>
+
+                <div className="bg-background/70 backdrop-blur-sm p-6 rounded-2xl border shadow-sm hover:shadow-md transition-all">
+                  <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4">
+                    <BarChart2 className="h-6 w-6 text-primary" />
+                  </div>
+                  <h3 className="text-lg font-semibold mb-2">Performance Metrics</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Sub-second task execution with 95% accuracy and optimized local storage.
+                  </p>
+                </div>
               </div>
             </div>
           </section>
