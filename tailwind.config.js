@@ -1,5 +1,8 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+import forms from '@tailwindcss/forms'
+import scrollbarHide from 'tailwind-scrollbar-hide'
+
+export default {
   darkMode: ["class"],
   content: [
     './pages/**/*.{ts,tsx}',
@@ -72,8 +75,5 @@ module.exports = {
       },
     },
   },
-  plugins: [
-    require('@tailwindcss/forms'),
-    require('tailwind-scrollbar-hide')
-  ],
+  plugins: [forms, scrollbarHide],
 }
