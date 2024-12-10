@@ -132,6 +132,12 @@ export default function AskQuestion() {
       setMessages(updatedMessages);
       setQuestion('');
 
+      // Reset textarea height to initial state
+      const textarea = document.querySelector('textarea');
+      if (textarea) {
+        textarea.style.height = '40px';
+      }
+
     } catch (err) {
       setError('Failed to send message');
       console.error('Failed to process message:', err);
@@ -271,7 +277,7 @@ export default function AskQuestion() {
                           className="w-full justify-start text-left"
                           onClick={() => {
                             handleNewChat();
-                            setQuestion("Generate a summary of my uploaded materials");
+                            setQuestion("Help me draft, analyze, or respond to emails professionally");
                           }}
                         >
                           Email Assistant
@@ -281,7 +287,7 @@ export default function AskQuestion() {
                           className="w-full justify-start text-left"
                           onClick={() => {
                             handleNewChat();
-                            setQuestion("What are the key concepts I should focus on?");
+                            setQuestion("Help me analyze research papers and extract key findings");
                           }}
                         >
                           Research Assistant
@@ -291,7 +297,7 @@ export default function AskQuestion() {
                           className="w-full justify-start text-left"
                           onClick={() => {
                             handleNewChat();
-                            setQuestion("Create a study plan based on my materials");
+                            setQuestion("Search and analyze information from my uploaded documents");
                           }}
                         >
                           Vector Database Assistant
@@ -316,21 +322,21 @@ export default function AskQuestion() {
                       <Button
                         variant="outline"
                         className="w-full justify-start text-left"
-                        onClick={() => setQuestion("Generate a summary of my uploaded materials")}
+                        onClick={() => setQuestion("Help me draft, analyze, or respond to emails professionally")}
                       >
                         Email Assistant
                       </Button>
                       <Button
                         variant="outline"
                         className="w-full justify-start text-left"
-                        onClick={() => setQuestion("What are the key concepts I should focus on?")}
+                        onClick={() => setQuestion("Help me analyze research papers and extract key findings")}
                       >
                         Research Assistant
                       </Button>
                       <Button
                         variant="outline"
                         className="w-full justify-start text-left"
-                        onClick={() => setQuestion("Create a study plan based on my materials")}
+                        onClick={() => setQuestion("Search and analyze information from my uploaded documents")}
                       >
                         Vector Database Assistant
                       </Button>
@@ -372,25 +378,49 @@ export default function AskQuestion() {
       {/* Input Box - Keep original styling */}
       <div className="sticky bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <form onSubmit={handleSubmit} className="mx-auto max-w-3xl">
-          <div className="flex items-center gap-2 h-full">
-            <input
-              type="text"
-              value={question}
-              onChange={(e) => setQuestion(e.target.value)}
-              placeholder="Ask me anything..."
-              className={cn(
-                'flex-1 rounded-full px-4 py-2 text-sm',
-                'bg-primary/5 border-primary/10',
-                'focus:outline-none focus:ring-2 focus:ring-primary/20',
-                'placeholder:text-muted-foreground'
-              )}
-              disabled={loading}
-            />
+          <div className="flex items-start gap-2">
+            <div className="flex-1 relative">
+              <textarea
+                value={question}
+                onChange={(e) => {
+                  setQuestion(e.target.value);
+                  // Reset the height to auto first to get the correct scrollHeight
+                  e.target.style.height = 'auto';
+                  // Calculate new height between min and max
+                  const newHeight = Math.max(
+                    40, // min height
+                    Math.min(e.target.scrollHeight, window.innerHeight * 0.4) // max height
+                  );
+                  e.target.style.height = `${newHeight}px`;
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSubmit(e);
+                  }
+                }}
+                placeholder="Ask me anything..."
+                rows={1}
+                className={cn(
+                  'w-full rounded-2xl px-4 py-3 text-sm resize-none',
+                  'bg-primary/5 border-primary/10',
+                  'focus:outline-none focus:ring-2 focus:ring-primary/20',
+                  'placeholder:text-muted-foreground',
+                  'min-h-[40px] transition-all duration-200',
+                  '[&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]'
+                )}
+                disabled={loading}
+                style={{
+                  height: '40px',
+                  maxHeight: `${window.innerHeight * 0.4}px` // 40% of viewport height
+                }}
+              />
+            </div>
             <Button
               type="submit"
               disabled={loading || !question.trim()}
               className={cn(
-                'rounded-full bg-gradient-to-r from-purple-400 to-purple-500 text-white h-8 w-8 p-0',
+                'rounded-full bg-gradient-to-r from-purple-400 to-purple-500 text-white h-10 w-10 p-0 flex-shrink-0',
                 'hover:from-purple-500 hover:to-purple-600',
                 'focus:outline-none focus:ring-2 focus:ring-primary/20',
                 'disabled:opacity-50'
