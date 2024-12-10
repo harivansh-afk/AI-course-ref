@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Loader2, X, History, MessageSquarePlus, AlertCircle } from 'lucide-react';
+import { Send, Loader2, X, History, MessageSquarePlus, AlertCircle, ArrowDown } from 'lucide-react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { Message } from '../../components/chat/Message';
@@ -21,6 +21,7 @@ export default function AskQuestion() {
   const [isNewChat, setIsNewChat] = useState(false);
   const [hasExistingChats, setHasExistingChats] = useState<boolean | null>(null);
   const [isTyping, setIsTyping] = useState(false);
+  const [showScrollButton, setShowScrollButton] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
@@ -168,13 +169,52 @@ export default function AskQuestion() {
     }
   };
 
+  // Function to handle scroll events
+  const handleScroll = () => {
+    if (scrollAreaRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = scrollAreaRef.current;
+      const isAtBottom = scrollHeight - scrollTop - clientHeight < 100;
+      setShowScrollButton(!isAtBottom);
+    }
+  };
+
+  // Add scroll event listener
+  useEffect(() => {
+    const scrollArea = scrollAreaRef.current;
+    if (scrollArea) {
+      scrollArea.addEventListener('scroll', handleScroll);
+      // Initial check for scroll position
+      handleScroll();
+      return () => scrollArea.removeEventListener('scroll', handleScroll);
+    }
+  }, []);
+
   // Auto-scroll when new messages arrive
   useEffect(() => {
     if (scrollAreaRef.current) {
       const scrollArea = scrollAreaRef.current;
-      scrollArea.scrollTop = scrollArea.scrollHeight;
+      const { scrollTop, scrollHeight, clientHeight } = scrollArea;
+      const isAtBottom = scrollHeight - scrollTop - clientHeight < 100;
+
+      // Only auto-scroll if user is already at bottom
+      if (isAtBottom) {
+        scrollArea.scrollTop = scrollArea.scrollHeight;
+      }
+
+      // Check if we should show scroll button
+      handleScroll();
     }
   }, [messages, isTyping]);
+
+  // Function to scroll to bottom
+  const scrollToBottom = () => {
+    if (scrollAreaRef.current) {
+      scrollAreaRef.current.scrollTo({
+        top: scrollAreaRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   // Show loading state while checking for existing chats
   if (hasExistingChats === null) {
@@ -240,17 +280,20 @@ export default function AskQuestion() {
         </div>
       </div>
 
-      {/* Main Chat Container - Added pb-20 to create space at bottom */}
-      <div className="flex-1 bg-background rounded-lg mx-4 flex flex-col min-h-0">
-        {/* Messages Container */}
-        <div className="flex-1 overflow-y-auto">
-          {error && (
-            <div className="flex-none mx-4 mt-4 flex items-center gap-2 rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
-              <AlertCircle className="h-4 w-4" />
-              {error}
-            </div>
-          )}
+      {/* Main Chat Container */}
+      <div className="flex-1 bg-background rounded-lg mx-4 overflow-hidden flex flex-col relative">
+        {/* Messages Container with ref moved to correct div */}
+        <div
+          ref={scrollAreaRef}
+          className="flex-1 overflow-y-auto relative"
+        >
           <div className="flex flex-col space-y-6 p-4">
+            {error && (
+              <div className="flex-none mb-4 flex items-center gap-2 rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
+                <AlertCircle className="h-4 w-4" />
+                {error}
+              </div>
+            )}
             {!isNewChat && !chatId ? (
               <div className="h-full flex items-center justify-center min-h-[calc(100vh-50rem)]">
                 <div className="max-w-md w-full space-y-8">
@@ -372,68 +415,96 @@ export default function AskQuestion() {
               </>
             )}
           </div>
-        </div>
-      </div>
 
-      {/* Input Box - Keep original styling */}
-      <div className="sticky bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <form onSubmit={handleSubmit} className="mx-auto max-w-3xl">
-          <div className="flex items-start gap-2">
-            <div className="flex-1 relative">
-              <textarea
-                value={question}
-                onChange={(e) => {
-                  setQuestion(e.target.value);
-                  // Reset the height to auto first to get the correct scrollHeight
-                  e.target.style.height = 'auto';
-                  // Calculate new height between min and max
-                  const newHeight = Math.max(
-                    40, // min height
-                    Math.min(e.target.scrollHeight, window.innerHeight * 0.4) // max height
-                  );
-                  e.target.style.height = `${newHeight}px`;
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSubmit(e);
-                  }
-                }}
-                placeholder="Ask me anything..."
-                rows={1}
-                className={cn(
-                  'w-full rounded-2xl px-4 py-3 text-sm resize-none',
-                  'bg-primary/5 border-primary/10',
-                  'focus:outline-none focus:ring-2 focus:ring-primary/20',
-                  'placeholder:text-muted-foreground',
-                  'min-h-[40px] transition-all duration-200',
-                  '[&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]'
-                )}
-                disabled={loading}
-                style={{
-                  height: '40px',
-                  maxHeight: `${window.innerHeight * 0.4}px` // 40% of viewport height
-                }}
-              />
+          {/* Scroll to Bottom Button */}
+          {showScrollButton && messages.length > 0 && (
+            <div className="absolute -left-16 bottom-2 animate-in fade-in duration-1000 slide-in-from-bottom-4">
+              <Button
+                onClick={scrollToBottom}
+                size="sm"
+                className="rounded-full shadow-lg bg-background hover:bg-accent transition-all duration-200 p-3 h-auto w-auto"
+              >
+                <ArrowDown className="h-5 w-5 text-primary" />
+              </Button>
             </div>
-            <Button
-              type="submit"
-              disabled={loading || !question.trim()}
-              className={cn(
-                'rounded-full bg-gradient-to-r from-purple-400 to-purple-500 text-white h-10 w-10 p-0 flex-shrink-0',
-                'hover:from-purple-500 hover:to-purple-600',
-                'focus:outline-none focus:ring-2 focus:ring-primary/20',
-                'disabled:opacity-50'
-              )}
-            >
-              {loading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Send className="h-4 w-4" />
-              )}
-            </Button>
+          )}
+        </div>
+
+        {/* Input Box */}
+        <div className="flex-none sticky bottom-0 left-0 right-0 p-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="relative mx-auto max-w-3xl">
+            {/* Scroll to Bottom Button */}
+            {showScrollButton && messages.length > 0 && (
+              <div className="absolute -left-14 top-1/2 -translate-y-1/2 animate-in fade-in duration-1000 slide-in-from-bottom-4">
+                <Button
+                  onClick={scrollToBottom}
+                  size="sm"
+                  className="rounded-full shadow-lg bg-background hover:bg-accent transition-all duration-200 p-3 h-auto w-auto"
+                >
+                  <ArrowDown className="h-5 w-5 text-primary" />
+                </Button>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit}>
+              <div className="flex items-start gap-2">
+                <div className="flex-1 relative">
+                  <textarea
+                    value={question}
+                    onChange={(e) => {
+                      setQuestion(e.target.value);
+                      // Reset the height to auto first to get the correct scrollHeight
+                      e.target.style.height = 'auto';
+                      // Calculate new height between min and max
+                      const newHeight = Math.max(
+                        40, // min height
+                        Math.min(e.target.scrollHeight, window.innerHeight * 0.4) // max height
+                      );
+                      e.target.style.height = `${newHeight}px`;
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        handleSubmit(e);
+                      }
+                    }}
+                    placeholder="Ask me anything..."
+                    rows={1}
+                    className={cn(
+                      'w-full rounded-2xl px-4 py-3 text-sm resize-none',
+                      'bg-primary/5 border-primary/10',
+                      'focus:outline-none focus:ring-2 focus:ring-primary/20',
+                      'placeholder:text-muted-foreground',
+                      'min-h-[40px] transition-all duration-200',
+                      '[&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]'
+                    )}
+                    disabled={loading}
+                    style={{
+                      height: '40px',
+                      maxHeight: `${window.innerHeight * 0.4}px` // 40% of viewport height
+                    }}
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  disabled={loading || !question.trim()}
+                  className={cn(
+                    'rounded-full bg-gradient-to-r from-purple-400 to-purple-500 text-white h-10 w-10 p-0 flex-shrink-0',
+                    'hover:from-purple-500 hover:to-purple-600',
+                    'focus:outline-none focus:ring-2 focus:ring-primary/20',
+                    'disabled:opacity-50'
+                  )}
+                >
+                  {loading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+            </form>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );
