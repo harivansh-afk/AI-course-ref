@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@radix-ui/react-alert-dialog": "^1.1.2",
     "@radix-ui/react-avatar": "^1.0.4",
     "@radix-ui/react-dialog": "^1.0.5",
     "@radix-ui/react-dropdown-menu": "^2.0.6",
@@ -26,6 +27,7 @@
     "@react-three/drei": "^9.120.3",
     "@react-three/fiber": "^8.17.10",
     "@supabase/supabase-js": "^2.47.0",
+    "@tailwindcss/line-clamp": "^0.4.4",
     "@types/three": "^0.170.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",

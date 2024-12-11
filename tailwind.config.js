@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 import forms from '@tailwindcss/forms'
 import scrollbarHide from 'tailwind-scrollbar-hide'
+import lineClamp from '@tailwindcss/line-clamp'
 
 export default {
   darkMode: ["class"],
@@ -75,5 +76,5 @@ export default {
       },
     },
   },
-  plugins: [forms, scrollbarHide],
+  plugins: [forms, scrollbarHide, lineClamp],
 }

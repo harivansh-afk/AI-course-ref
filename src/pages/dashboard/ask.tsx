@@ -57,23 +57,42 @@ export default function AskQuestion() {
       try {
         // Don't try to load chat if we're using a temporary ID
         if (chatId.startsWith('temp-')) {
+          // For new chats, create a temporary chat instance
+          const tempChat: ChatInstance = {
+            id: chatId,
+            created_at: '',
+            user_id: 'system',
+            title: 'New Chat',
+            last_message_at: '',
+          };
+          setChat(tempChat);
+          setMessages([]);
           return;
         }
 
-        // Load chat instance
-        const chatInstance = await chatService.getChatInstance(chatId);
-        if (!chatInstance) {
-          setError('Chat not found');
-          return;
-        }
-        setChat(chatInstance);
-
-        // Load messages
+        // Load messages for existing chats
         const messages = await chatService.getChatMessages(chatId);
         setMessages(messages);
+
+        // For existing chats, either load from storage or create from messages
+        const existingChat = await chatService.getChatInstance(chatId);
+        if (existingChat) {
+          setChat(existingChat);
+        } else if (messages.length > 0) {
+          // Create a chat instance from the first message
+          const firstMessage = messages[0];
+          const chatInstance: ChatInstance = {
+            id: chatId,
+            created_at: '',
+            user_id: 'system',
+            title: firstMessage.content.slice(0, 50) + '...',
+            last_message_at: '',
+          };
+          setChat(chatInstance);
+        }
       } catch (err) {
-        setError('Failed to load chat');
         console.error('Error loading chat:', err);
+        setError('Failed to load chat');
       }
     };
 
@@ -109,18 +128,11 @@ export default function AskQuestion() {
     try {
       let currentChatId: string;
 
-      // If no chat exists or we're on the base ask page, create a new one
-      if (!chatId || chatId === undefined) {
-        const title = generateChatTitle(question.trim());
-        const newChat = await chatService.createChatInstance(user.id, title);
-        if (!newChat) {
-          throw new Error('Failed to create chat instance');
-        }
-        currentChatId = newChat.id;
-        setChat(newChat);
-        setIsNewChat(false);
+      // If no chat exists or we're starting a new chat, generate a new session ID
+      if (!chatId || chatId.startsWith('temp-')) {
+        currentChatId = crypto.randomUUID();
         // Update URL with the real chat ID
-        navigate(`/dashboard/ask/${newChat.id}`, { replace: true });
+        navigate(`/dashboard/ask/${currentChatId}`, { replace: true });
       } else {
         currentChatId = chatId;
       }

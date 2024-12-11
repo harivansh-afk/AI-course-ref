@@ -1,4 +1,5 @@
-import type { ChatInstance, ChatMessage } from '../types/supabase';
+import type { ChatInstance, ChatMessage, N8NChatHistory } from '../types/supabase';
+import { supabase } from './supabase';
 
 // Helper function to generate UUIDs
 const generateId = () => crypto.randomUUID();
@@ -71,6 +72,39 @@ const sendToN8N = async (sessionId: string, message: string): Promise<N8NRespons
   }
 };
 
+// Helper function to group messages by session and create chat instances
+const createChatInstanceFromMessages = (messages: N8NChatHistory[]): ChatInstance[] => {
+  const sessionMap = new Map<string, N8NChatHistory[]>();
+  
+  // Group messages by session_id
+  messages.forEach(msg => {
+    const existing = sessionMap.get(msg.session_id) || [];
+    sessionMap.set(msg.session_id, [...existing, msg]);
+  });
+
+  // Convert each session group into a ChatInstance
+  return Array.from(sessionMap.entries()).map(([sessionId, messages]) => {
+    const sortedMessages = messages.sort((a, b) => a.id - b.id);
+    const firstMessage = sortedMessages[0];
+    
+    return {
+      id: sessionId,
+      created_at: '',
+      user_id: 'system',
+      title: firstMessage.message.content.slice(0, 50) + '...',
+      last_message_at: '',
+    };
+  });
+};
+
+interface ChatStats {
+  messageCount: number;
+  firstMessage: string;
+  lastMessage: string;
+  humanMessages: number;
+  aiMessages: number;
+}
+
 export const chatService = {
   async createChatInstance(userId: string, title: string): Promise<ChatInstance | null> {
     try {
@@ -122,10 +156,14 @@ export const chatService = {
 
   async getChatInstances(userId: string): Promise<ChatInstance[]> {
     try {
-      const chats = getFromStorage<ChatInstance>('chat_instances');
-      return chats
-        .filter(chat => chat.user_id === userId)
-        .sort((a, b) => new Date(b.last_message_at).getTime() - new Date(a.last_message_at).getTime());
+      const { data: messages, error } = await supabase
+        .from('n8n_chat_histories')
+        .select('*')
+        .order('id', { ascending: false });
+
+      if (error) throw error;
+      
+      return createChatInstanceFromMessages(messages);
     } catch (error) {
       console.error('Error fetching chat instances:', error);
       return [];
@@ -134,10 +172,26 @@ export const chatService = {
 
   async getChatMessages(chatId: string): Promise<ChatMessage[]> {
     try {
-      const messages = getFromStorage<ChatMessage>('chat_messages');
-      return messages
-        .filter(message => message.chat_id === chatId)
-        .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+      const { data: messages, error } = await supabase
+        .from('n8n_chat_histories')
+        .select('*')
+        .eq('session_id', chatId)
+        .order('id', { ascending: true });
+
+      if (error) throw error;
+
+      // Convert N8NChatHistory to ChatMessage format
+      return messages.map(msg => ({
+        id: msg.id.toString(),
+        chat_id: msg.session_id,
+        content: msg.message.content,
+        role: msg.message.type === 'human' ? 'user' : 'assistant',
+        created_at: new Date(msg.id).toISOString(), // Using id as timestamp approximation
+        metadata: {
+          ...msg.message.response_metadata,
+          ...msg.message.additional_kwargs
+        }
+      }));
     } catch (error) {
       console.error('Error fetching chat messages:', error);
       return [];
@@ -157,7 +211,7 @@ export const chatService = {
         chat_id: chatId,
         content,
         role,
-        created_at: new Date().toISOString(),
+        created_at: '', // Empty string for timestamp
         metadata,
       };
 
@@ -178,7 +232,7 @@ export const chatService = {
               chat_id: chatId,
               content: n8nResponse.response.content,
               role: 'assistant',
-              created_at: new Date().toISOString(),
+              created_at: '', // Empty string for timestamp
               metadata: {
                 ...n8nResponse.response.metadata,
                 make_response_id: userMessage.id // Link to the user's message
@@ -200,7 +254,7 @@ export const chatService = {
             chat_id: chatId,
             content: 'Sorry, I encountered an error processing your request.',
             role: 'assistant',
-            created_at: new Date().toISOString(),
+            created_at: '', // Empty string for timestamp
             metadata: {
               error: 'Failed to process message',
               make_response_id: userMessage.id
@@ -212,17 +266,9 @@ export const chatService = {
         }
       }
 
-      // Update last_message_at in chat instance
-      const chats = getFromStorage<ChatInstance>('chat_instances');
-      const chatIndex = chats.findIndex(chat => chat.id === chatId);
-      if (chatIndex !== -1) {
-        chats[chatIndex].last_message_at = new Date().toISOString();
-        setInStorage('chat_instances', chats);
-      }
-
       // Return all messages for this chat
       const updatedMessages = messages.filter(msg => msg.chat_id === chatId)
-        .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+        .sort((a, b) => messages.indexOf(a) - messages.indexOf(b)); // Sort by order of addition
       console.log('Returning updated messages:', updatedMessages);
       return updatedMessages;
     } catch (error) {
@@ -231,18 +277,40 @@ export const chatService = {
     }
   },
 
+  async getChatStats(chatId: string): Promise<ChatStats | null> {
+    try {
+      const { data: messages, error } = await supabase
+        .from('n8n_chat_histories')
+        .select('*')
+        .eq('session_id', chatId)
+        .order('id', { ascending: true });
+
+      if (error) throw error;
+      if (!messages || messages.length === 0) return null;
+
+      const stats: ChatStats = {
+        messageCount: messages.length,
+        firstMessage: messages[0].message.content,
+        lastMessage: messages[messages.length - 1].message.content,
+        humanMessages: messages.filter(m => m.message.type === 'human').length,
+        aiMessages: messages.filter(m => m.message.type === 'ai').length
+      };
+
+      return stats;
+    } catch (error) {
+      console.error('Error getting chat stats:', error);
+      return null;
+    }
+  },
+
   async deleteChatInstance(chatId: string): Promise<boolean> {
     try {
-      // Delete all messages for this chat
-      const messages = getFromStorage<ChatMessage>('chat_messages');
-      const filteredMessages = messages.filter(message => message.chat_id !== chatId);
-      setInStorage('chat_messages', filteredMessages);
+      const { error } = await supabase
+        .from('n8n_chat_histories')
+        .delete()
+        .eq('session_id', chatId);
 
-      // Delete the chat instance
-      const chats = getFromStorage<ChatInstance>('chat_instances');
-      const filteredChats = chats.filter(chat => chat.id !== chatId);
-      setInStorage('chat_instances', filteredChats);
-
+      if (error) throw error;
       return true;
     } catch (error) {
       console.error('Error deleting chat instance:', error);
