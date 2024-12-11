@@ -62,4 +62,31 @@
   .gradient-text {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-[#9333EA] to-[#A855F7];
   }
+
+  /* Animation Delays */
+  .animation-delay-0 {
+    animation-delay: 0s;
+  }
+
+  .animation-delay-150 {
+    animation-delay: 0.15s;
+  }
+
+  .animation-delay-300 {
+    animation-delay: 0.3s;
+  }
+
+  /* Custom bounce animation */
+  @keyframes custom-bounce {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-4px);
+    }
+  }
+
+  .animate-bounce {
+    animation: custom-bounce 1s infinite;
+  }
 }

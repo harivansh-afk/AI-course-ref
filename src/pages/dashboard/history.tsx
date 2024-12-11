@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { MessageSquare, Trash2, User, Bot } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { MessageSquare, Trash2, User, Bot, Loader2 } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { useAuth } from '../../contexts/AuthContext';
 import { chatService } from '../../lib/chat-service';
@@ -27,6 +27,7 @@ interface ChatWithStats extends ChatInstance {
 
 export default function StudyHistory() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [chats, setChats] = useState<ChatWithStats[]>([]);
   const [loading, setLoading] = useState(true);
   const [chatToDelete, setChatToDelete] = useState<string | null>(null);
@@ -63,10 +64,22 @@ export default function StudyHistory() {
     setChatToDelete(null);
   };
 
+  const handleNewChat = async () => {
+    try {
+      const newChat = await chatService.createChatInstance(user!.id, "New Chat");
+      if (!newChat) {
+        throw new Error("Failed to create new chat");
+      }
+      navigate(`/dashboard/ask/${newChat.id}`, { replace: true });
+    } catch (err) {
+      console.error('Failed to create new chat:', err);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex h-full items-center justify-center">
-        <div className="text-lg">Loading...</div>
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -78,12 +91,13 @@ export default function StudyHistory() {
           <h1 className="text-2xl font-bold">Chat History</h1>
           <p className="text-muted-foreground">View your past conversations</p>
         </div>
-        <Link to="/dashboard/ask">
-          <Button className="bg-gradient-to-r from-purple-400 to-purple-500 hover:from-purple-500 hover:to-purple-600 text-white">
-            <MessageSquare className="mr-2 h-4 w-4" />
-            New Chat
-          </Button>
-        </Link>
+        <Button 
+          onClick={handleNewChat}
+          className="bg-gradient-to-r from-purple-400 to-purple-500 hover:from-purple-500 hover:to-purple-600 text-white"
+        >
+          <MessageSquare className="mr-2 h-4 w-4" />
+          New Chat
+        </Button>
       </div>
 
       {chats.length === 0 ? (
@@ -92,11 +106,12 @@ export default function StudyHistory() {
           <p className="mt-1 text-sm text-muted-foreground">
             Start a new conversation to see it here
           </p>
-          <Link to="/dashboard/ask" className="mt-4 inline-block">
-            <Button className="bg-gradient-to-r from-purple-400 to-purple-500 hover:from-purple-500 hover:to-purple-600 text-white">
-              Start a new chat
-            </Button>
-          </Link>
+          <Button 
+            onClick={handleNewChat}
+            className="mt-4 bg-gradient-to-r from-purple-400 to-purple-500 hover:from-purple-500 hover:to-purple-600 text-white"
+          >
+            Start a new chat
+          </Button>
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

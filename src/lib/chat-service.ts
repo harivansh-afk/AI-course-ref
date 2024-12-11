@@ -31,7 +31,7 @@ interface N8NResponse {
 }
 
 // Function to send message to n8n webhook and handle response
-const sendToN8N = async (sessionId: string, message: string): Promise<N8NResponse> => {
+export const sendToN8N = async (sessionId: string, message: string): Promise<N8NResponse> => {
   try {
     console.log('Sending message to n8n:', { sessionId, message });
 

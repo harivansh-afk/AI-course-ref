@@ -64,51 +64,59 @@ export const Message: React.FC<MessageProps> = ({ message, isLast }) => {
   };
 
   return (
-    <div
-      className={cn(
-        'group flex w-full items-start gap-4 px-4',
-        isUser && 'flex-row-reverse'
-      )}
-    >
-      <Avatar className={cn(
-        'flex h-8 w-8 shrink-0 select-none overflow-hidden rounded-full',
-        isUser 
-          ? 'ring-2 ring-secondary/20 hover:ring-secondary/40 transition-all duration-300' 
-          : 'ring-2 ring-purple-500/20 hover:ring-purple-500/40 transition-all duration-300'
-      )}>
-        <AvatarFallback className={cn(
-          'flex h-full w-full items-center justify-center rounded-full text-xs font-medium',
+    <div className={cn(
+      'group relative py-8 first:pt-4 last:pb-4',
+      isUser ? 'bg-background' : 'bg-secondary/30'
+    )}>
+      <div className="mx-auto flex items-start gap-6">
+        <Avatar className={cn(
+          'flex h-8 w-8 shrink-0 select-none overflow-hidden rounded-sm',
           isUser 
-            ? 'bg-secondary text-secondary-foreground'
-            : 'bg-gradient-to-br from-purple-300 to-purple-500 text-white'
+            ? 'ring-1 ring-secondary/20' 
+            : 'ring-1 ring-purple-500/20'
         )}>
-          {isUser ? 'You' : 'AI'}
-        </AvatarFallback>
-      </Avatar>
+          <AvatarFallback className={cn(
+            'flex h-full w-full items-center justify-center text-xs font-medium',
+            isUser 
+              ? 'bg-secondary text-secondary-foreground'
+              : 'bg-gradient-to-br from-purple-400 to-purple-600 text-white'
+          )}>
+            {isUser ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
+          </AvatarFallback>
+        </Avatar>
 
-      <div className={cn('flex flex-col gap-2', isUser ? 'items-end' : 'items-start')}>
-        <div className={cn(
-          'relative rounded-lg px-4 py-3 text-sm transition-all duration-200 max-w-[800px]',
-          isUser
-            ? 'bg-gradient-to-r from-purple-400 to-purple-500 text-white shadow-lg shadow-purple-500/20 hover:shadow-purple-500/30 hover:translate-y-[-1px]'
-            : 'bg-background/60 backdrop-blur-sm shadow-[0_4px_20px_-8px_rgba(0,0,0,0.1)] hover:shadow-[0_8px_30px_-12px_rgba(0,0,0,0.15)] hover:bg-background/80 hover:translate-y-[-1px]'
-        )}>
+        <div className="flex-1 space-y-4 overflow-hidden">
           <div className={cn(
-            'prose prose-sm max-w-none',
-            isUser ? 'prose-invert' : 'prose-neutral dark:prose-invert',
-            'prose-p:leading-relaxed prose-p:mb-2 last:prose-p:mb-0'
+            'prose prose-sm max-w-none break-words',
+            isUser ? 'prose-neutral' : 'prose-neutral',
+            'prose-p:leading-relaxed prose-pre:bg-secondary/50 prose-pre:border prose-pre:border-border'
           )}>
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               components={{
                 pre: ({ node, ...props }) => (
-                  <div className="overflow-auto rounded-lg bg-muted p-4">
-                    <pre {...props} />
+                  <div className="relative group/code mt-4">
+                    <div className="absolute right-2 top-2 opacity-0 group-hover/code:opacity-100 transition-opacity">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 p-0 hover:bg-secondary"
+                        onClick={() => {
+                          const code = props.children?.[0]?.props?.children?.[0];
+                          if (code) {
+                            navigator.clipboard.writeText(code);
+                          }
+                        }}
+                      >
+                        {messageCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                      </Button>
+                    </div>
+                    <pre {...props} className="rounded-lg bg-secondary/50 p-4 overflow-x-auto" />
                   </div>
                 ),
                 code: ({ node, inline, ...props }) =>
                   inline ? (
-                    <code className="rounded-sm bg-muted px-1 py-0.5" {...props} />
+                    <code className="rounded-sm bg-secondary/50 px-1 py-0.5" {...props} />
                   ) : (
                     <code {...props} />
                   ),
@@ -120,70 +128,66 @@ export const Message: React.FC<MessageProps> = ({ message, isLast }) => {
 
           {!isUser && usedTools.length > 0 && (
             <>
-              <Separator className="my-2 opacity-30" />
-              <div className="flex flex-col gap-1 text-xs text-muted-foreground">
-                <div className="flex items-center gap-1">
+              <Separator className="my-4 opacity-30" />
+              <div className="flex flex-col gap-1.5 text-xs text-muted-foreground">
+                <div className="flex items-center gap-1.5">
                   <Wrench className="h-3 w-3" />
                   <span className="font-medium">Used Tools:</span>
                 </div>
                 {usedTools.map((tool, index) => (
-                  <div key={index} className="flex items-center gap-1 pl-4">
+                  <div key={index} className="flex items-center gap-1.5 pl-4">
                     <span>{tool}</span>
                   </div>
                 ))}
               </div>
             </>
           )}
-        </div>
 
-        <div className={cn(
-          'flex items-center gap-2 text-xs',
-          'opacity-0 group-hover:opacity-100 transition-opacity duration-200'
-        )}>
-          {!isUser && (
-            <>
-              <Tooltip content="Helpful">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={cn(
-                    "h-6 w-6 p-0 hover:text-purple-500",
-                    isLiked && "text-purple-500"
-                  )}
-                  onClick={() => handleFeedback('like')}
-                >
-                  <ThumbsUp className="h-3 w-3" />
-                </Button>
-              </Tooltip>
-              <Tooltip content="Not helpful">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={cn(
-                    "h-6 w-6 p-0 hover:text-purple-500",
-                    isDisliked && "text-purple-500"
-                  )}
-                  onClick={() => handleFeedback('dislike')}
-                >
-                  <ThumbsDown className="h-3 w-3" />
-                </Button>
-              </Tooltip>
-            </>
-          )}
-          <Tooltip content={messageCopied ? "Copied!" : "Copy message"}>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-6 w-6 p-0 hover:text-purple-500"
-              onClick={handleMessageCopy}
-            >
-              {messageCopied ? (
-                <Check className="h-3 w-3" />
-              ) : (
-                <Copy className="h-3 w-3" />
-              )}
-            </Button>
-          </Tooltip>
+          <div className={cn(
+            'flex items-center gap-2 text-xs',
+            'opacity-0 group-hover:opacity-100 transition-opacity duration-200'
+          )}>
+            {!isUser && (
+              <>
+                <Tooltip content={isLiked ? "Remove like" : "Like message"}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "h-7 w-7 p-0 hover:text-purple-500",
+                      isLiked && "text-purple-500"
+                    )}
+                    onClick={() => handleFeedback('like')}
+                  >
+                    <ThumbsUp className="h-3.5 w-3.5" />
+                  </Button>
+                </Tooltip>
+                <Tooltip content={isDisliked ? "Remove dislike" : "Dislike message"}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "h-7 w-7 p-0 hover:text-purple-500",
+                      isDisliked && "text-purple-500"
+                    )}
+                    onClick={() => handleFeedback('dislike')}
+                  >
+                    <ThumbsDown className="h-3.5 w-3.5" />
+                  </Button>
+                </Tooltip>
+                <Tooltip content={messageCopied ? "Copied!" : "Copy message"}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-7 w-7 p-0 hover:text-purple-500"
+                    onClick={handleMessageCopy}
+                  >
+                    {messageCopied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                  </Button>
+                </Tooltip>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>

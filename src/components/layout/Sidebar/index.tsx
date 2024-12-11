@@ -2,17 +2,18 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   Settings,
-  MessageSquarePlus,
+  MessageSquare,
   Upload,
   History
 } from 'lucide-react';
 import { cn } from '../../../lib/utils';
+import { useLatestChat } from '../../../hooks/useLatestChat';
 
 const sidebarItems = [
   {
-    icon: MessageSquarePlus,
-    label: 'Ask a Question',
-    path: '/dashboard/ask'
+    icon: MessageSquare,
+    label: 'Chat',
+    path: '/dashboard/ask?new=true'
   },
   {
     icon: History,
@@ -33,21 +34,47 @@ const sidebarItems = [
 
 const Sidebar = () => {
   const location = useLocation();
+  const { navigateToChat } = useLatestChat();
 
   const isActive = (path: string) => {
-    if (path === '/dashboard/ask') {
+    if (path.startsWith('/dashboard/ask')) {
       return location.pathname.startsWith('/dashboard/ask') || location.pathname === '/dashboard';
     }
     return location.pathname === path;
   };
 
   return (
-    <div className="w-64 shrink-0">
-      <div className="rounded-2xl bg-background/70 backdrop-blur-lg shadow-lg h-full p-4">
-        <nav className="space-y-2">
-          {sidebarItems.map((item) => {
+    <div className="h-full">
+      <div className="flex flex-col h-full space-y-4">
+        {/* Navigation Links */}
+        <nav className="flex-1 space-y-1">
+          {sidebarItems.map((item, index) => {
             const Icon = item.icon;
             const active = isActive(item.path);
+
+            if (index === 0) {
+              // Special handling for Chat button
+              return (
+                <button
+                  key={item.path}
+                  onClick={navigateToChat}
+                  className={cn(
+                    'w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200',
+                    active
+                      ? 'bg-purple-50/50 text-purple-500'
+                      : 'text-muted-foreground hover:bg-purple-50/30 hover:text-purple-500'
+                  )}
+                >
+                  <Icon className={cn(
+                    'h-5 w-5',
+                    active
+                      ? 'text-purple-500'
+                      : 'text-muted-foreground group-hover:text-purple-500'
+                  )} />
+                  {item.label}
+                </button>
+              );
+            }
 
             return (
               <Link
@@ -56,14 +83,14 @@ const Sidebar = () => {
                 className={cn(
                   'flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200',
                   active
-                    ? 'bg-gradient-to-r from-purple-400 to-purple-500 text-white shadow-sm hover:from-purple-500 hover:to-purple-600'
-                    : 'text-muted-foreground hover:bg-purple-50/50 hover:text-purple-500'
+                    ? 'bg-purple-50/50 text-purple-500'
+                    : 'text-muted-foreground hover:bg-purple-50/30 hover:text-purple-500'
                 )}
               >
                 <Icon className={cn(
                   'h-5 w-5',
                   active
-                    ? 'text-white'
+                    ? 'text-purple-500'
                     : 'text-muted-foreground group-hover:text-purple-500'
                 )} />
                 {item.label}

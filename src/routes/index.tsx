@@ -55,7 +55,8 @@ export const AppRouter: React.FC = () => {
             </PrivateRoute>
           }
         >
-          <Route index element={<Navigate to="ask" replace />} />
+          {/* Redirect /dashboard to /dashboard/ask with new=true to prevent flashing */}
+          <Route index element={<Navigate to="ask?new=true" replace />} />
           <Route path="ask" element={withSuspense(AskQuestion)} />
           <Route path="ask/:chatId" element={withSuspense(AskQuestion)} />
           <Route path="upload" element={withSuspense(UploadMaterials)} />
