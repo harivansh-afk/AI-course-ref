@@ -4,10 +4,13 @@ import {
   Settings,
   MessageSquare,
   Upload,
-  History
+  History,
+  PanelLeftClose,
+  PanelLeft
 } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import { useLatestChat } from '../../../hooks/useLatestChat';
+import { useSidebar } from '../../../hooks/useSidebar';
 
 const sidebarItems = [
   {
@@ -35,6 +38,7 @@ const sidebarItems = [
 const Sidebar = () => {
   const location = useLocation();
   const { navigateToChat } = useLatestChat();
+  const { isHidden, setIsHidden } = useSidebar();
 
   const isActive = (path: string) => {
     if (path.startsWith('/dashboard/ask')) {
@@ -44,8 +48,13 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="h-full">
-      <div className="flex flex-col h-full space-y-4">
+    <div 
+      className={cn(
+        "fixed left-0 top-16 bottom-0 w-[280px] bg-background border-r transition-all duration-300 z-50",
+        isHidden ? "-translate-x-[280px]" : "translate-x-0"
+      )}
+    >
+      <div className="flex flex-col h-full p-4">
         {/* Navigation Links */}
         <nav className="flex-1 space-y-1">
           {sidebarItems.map((item, index) => {
@@ -62,14 +71,14 @@ const Sidebar = () => {
                     'w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200',
                     active
                       ? 'bg-purple-50/50 text-purple-500'
-                      : 'text-muted-foreground hover:bg-purple-50/30 hover:text-purple-500'
+                      : 'text-muted-foreground'
                   )}
                 >
                   <Icon className={cn(
                     'h-5 w-5',
                     active
                       ? 'text-purple-500'
-                      : 'text-muted-foreground group-hover:text-purple-500'
+                      : 'text-muted-foreground'
                   )} />
                   {item.label}
                 </button>
@@ -84,20 +93,38 @@ const Sidebar = () => {
                   'flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200',
                   active
                     ? 'bg-purple-50/50 text-purple-500'
-                    : 'text-muted-foreground hover:bg-purple-50/30 hover:text-purple-500'
+                    : 'text-muted-foreground'
                 )}
               >
                 <Icon className={cn(
                   'h-5 w-5',
                   active
                     ? 'text-purple-500'
-                    : 'text-muted-foreground group-hover:text-purple-500'
+                    : 'text-muted-foreground'
                 )} />
                 {item.label}
               </Link>
             );
           })}
         </nav>
+
+        {/* Toggle Button */}
+        <button
+          onClick={() => setIsHidden(!isHidden)}
+          className="flex items-center gap-2 px-4 py-2 mt-4 text-sm font-medium rounded-xl transition-all duration-200 text-muted-foreground"
+        >
+          {isHidden ? (
+            <>
+              <PanelLeft className="h-5 w-5" />
+              Show Sidebar
+            </>
+          ) : (
+            <>
+              <PanelLeftClose className="h-5 w-5" />
+              Hide Sidebar
+            </>
+          )}
+        </button>
       </div>
     </div>
   );
