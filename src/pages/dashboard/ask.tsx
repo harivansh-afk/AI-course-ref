@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Send, Loader2, X, History, MessageSquarePlus, AlertCircle, ArrowDown, Trash2, Bot } from 'lucide-react';
+import { Send, Loader2, X, History, MessageSquarePlus, AlertCircle, ArrowDown, Trash2, Bot, FileText, Sparkles, Search, BookOpen, BrainCircuit, Mail, Calendar, Calculator, Database, Users } from 'lucide-react';
 import { Link, useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { Message } from '../../components/chat/Message';
@@ -234,80 +234,130 @@ export default function AskQuestion() {
       {/* Messages */}
       <div
         ref={scrollAreaRef}
-        className="flex-1 overflow-y-auto scroll-smooth"
+        className="flex-1 overflow-y-auto scroll-smooth pb-[100px]"
         onScroll={handleScroll}
       >
         {!isLoadingChat && messages.length === 0 && !loading ? (
-          <div className="flex h-full flex-col items-center justify-center">
-            <h1 className="mb-10 text-2xl font-bold">
-              What can I help with?
-            </h1>
-            <div className={cn(
-              "w-full max-w-3xl transform transition-all duration-300 ease-in-out",
-              loading && messages.length === 0 ? "opacity-0 translate-y-[-20px]" : "opacity-100 translate-y-0"
-            )}>
-              <form onSubmit={handleSubmit} className="relative flex flex-col items-end gap-2 px-4">
-                <div className="relative flex w-full flex-col overflow-hidden rounded-2xl border bg-background shadow-[0_0_15px_rgba(0,0,0,0.1)] dark:shadow-[0_0_15px_rgba(0,0,0,0.3)]">
-                  <textarea
-                    value={question}
-                    onChange={handleQuestionChange}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Message RagAI..."
-                    rows={1}
-                    className="min-h-[52px] w-full resize-none border-0 bg-transparent px-4 py-[14px] focus-visible:outline-none disabled:opacity-50"
-                    style={{ 
-                      maxHeight: '200px',
-                      scrollbarWidth: 'none',
-                      msOverflowStyle: 'none'
-                    }}
-                    disabled={loading}
-                  />
-                  <div className="absolute right-3 top-3 flex items-center gap-2">
-                    {loading ? (
-                      <Button
-                        type="button"
-                        size="icon"
-                        variant="ghost"
-                        className="h-7 w-7 hover:bg-gray-100"
-                        onClick={() => setLoading(false)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    ) : (
-                      <Button
-                        type="submit"
-                        size="icon"
-                        className={cn(
-                          "h-8 w-8 rounded-2xl bg-gray-100 text-gray-600 transition-all hover:bg-gray-200",
-                          !question.trim() && "opacity-40 cursor-not-allowed hover:bg-gray-100"
-                        )}
-                        disabled={!question.trim()}
-                      >
-                        <Send className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
-                </div>
-                <div className="flex w-full items-center justify-between text-[11px] text-muted-foreground">
-                  <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 px-2 text-xs hover:bg-purple-50"
-                        onClick={handleNewChat}
-                      >
-                        <MessageSquarePlus className="mr-1 h-3 w-3" />
-                        New Chat
-                      </Button>
+          <div className="flex h-full flex-col items-center">
+            <div className="flex h-[25vh] flex-col items-center justify-center">
+              <h1 className="mb-10 text-2xl font-bold">
+                What can I help with?
+              </h1>
+              <div className={cn(
+                "w-full max-w-3xl transform transition-all duration-300 ease-in-out",
+                loading && messages.length === 0 ? "opacity-0 translate-y-[-20px]" : "opacity-100 translate-y-0"
+              )}>
+                <form onSubmit={handleSubmit} className="relative flex flex-col items-end gap-2 px-4">
+                  <div className="relative flex w-full flex-col overflow-hidden rounded-2xl border bg-background shadow-[0_0_15px_rgba(0,0,0,0.1)] dark:shadow-[0_0_15px_rgba(0,0,0,0.3)]">
+                    <textarea
+                      value={question}
+                      onChange={handleQuestionChange}
+                      onKeyDown={handleKeyDown}
+                      placeholder="Message RagAI..."
+                      rows={1}
+                      className="min-h-[52px] w-full resize-none border-0 bg-transparent px-4 py-[14px] focus-visible:outline-none disabled:opacity-50"
+                      style={{ 
+                        maxHeight: '200px',
+                        scrollbarWidth: 'none',
+                        msOverflowStyle: 'none'
+                      }}
+                      disabled={loading}
+                    />
+                    <div className="absolute right-3 top-3 flex items-center gap-2">
+                      {loading ? (
+                        <Button
+                          type="button"
+                          size="icon"
+                          variant="ghost"
+                          className="h-7 w-7 hover:bg-gray-100"
+                          onClick={() => setLoading(false)}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      ) : (
+                        <Button
+                          type="submit"
+                          size="icon"
+                          className={cn(
+                            "h-8 w-8 rounded-2xl bg-gray-100 text-gray-600 transition-all hover:bg-gray-200",
+                            !question.trim() && "opacity-40 cursor-not-allowed hover:bg-gray-100"
+                          )}
+                          disabled={!question.trim()}
+                        >
+                          <Send className="h-4 w-4" />
+                        </Button>
+                      )}
                     </div>
                   </div>
-                  <p>
-                    AI may produce inaccurate information about people, places, or facts.
-                  </p>
+                  <div className="flex w-full items-center justify-between text-[11px] text-muted-foreground">
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-2">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 px-2 text-xs hover:bg-purple-50"
+                          onClick={handleNewChat}
+                        >
+                          <MessageSquarePlus className="mr-1 h-3 w-3" />
+                          New Chat
+                        </Button>
+                      </div>
+                    </div>
+                    <p>
+                      AI may produce inaccurate information about people, places, or facts.
+                    </p>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <div className="w-full max-w-4xl mt-0">
+              <h2 className="text-xl font-semibold text-center mb-3">AI Assistant Capabilities</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 px-4">
+                <div className="group relative rounded-2xl border bg-card p-6 hover:shadow-md transition-all hover:border-purple-200">
+                  <div className="h-10 w-10 rounded-full bg-purple-50 flex items-center justify-center mb-4">
+                    <Search className="h-5 w-5 text-purple-500" />
+                  </div>
+                  <h3 className="font-semibold mb-2">Research Assistant</h3>
+                  <p className="text-sm text-muted-foreground">Perform comprehensive web research, analyze search results, and provide curated information from trusted sources across the internet</p>
                 </div>
-              </form>
+                <div className="group relative rounded-2xl border bg-card p-6 hover:shadow-md transition-all hover:border-purple-200">
+                  <div className="h-10 w-10 rounded-full bg-purple-50 flex items-center justify-center mb-4">
+                    <Mail className="h-5 w-5 text-purple-500" />
+                  </div>
+                  <h3 className="font-semibold mb-2">Email Management</h3>
+                  <p className="text-sm text-muted-foreground">Draft, send, and organize emails with secure access to your inbox. Schedule emails and manage correspondence with smart filtering</p>
+                </div>
+                <div className="group relative rounded-2xl border bg-card p-6 hover:shadow-md transition-all hover:border-purple-200">
+                  <div className="h-10 w-10 rounded-full bg-purple-50 flex items-center justify-center mb-4">
+                    <Calendar className="h-5 w-5 text-purple-500" />
+                  </div>
+                  <h3 className="font-semibold mb-2">Calendar Assistant</h3>
+                  <p className="text-sm text-muted-foreground">Schedule meetings, find optimal time slots, and manage your calendar with smart conflict resolution and availability tracking</p>
+                </div>
+                <div className="group relative rounded-2xl border bg-card p-6 hover:shadow-md transition-all hover:border-purple-200">
+                  <div className="h-10 w-10 rounded-full bg-purple-50 flex items-center justify-center mb-4">
+                    <Calculator className="h-5 w-5 text-purple-500" />
+                  </div>
+                  <h3 className="font-semibold mb-2">Advanced Computation</h3>
+                  <p className="text-sm text-muted-foreground">Solve complex mathematical problems, perform scientific calculations, and visualize data using Wolfram Alpha's computational intelligence</p>
+                </div>
+                <div className="group relative rounded-2xl border bg-card p-6 hover:shadow-md transition-all hover:border-purple-200">
+                  <div className="h-10 w-10 rounded-full bg-purple-50 flex items-center justify-center mb-4">
+                    <Database className="h-5 w-5 text-purple-500" />
+                  </div>
+                  <h3 className="font-semibold mb-2">Document Intelligence</h3>
+                  <p className="text-sm text-muted-foreground">Access and analyze your document library with advanced vector search, providing contextual understanding and precise information retrieval</p>
+                </div>
+                <div className="group relative rounded-2xl border bg-card p-6 hover:shadow-md transition-all hover:border-purple-200">
+                  <div className="h-10 w-10 rounded-full bg-purple-50 flex items-center justify-center mb-4">
+                    <Users className="h-5 w-5 text-purple-500" />
+                  </div>
+                  <h3 className="font-semibold mb-2">Contact Management</h3>
+                  <p className="text-sm text-muted-foreground">Access and manage your contact database with smart search, relationship tracking, and organized contact information retrieval</p>
+                </div>
+              </div>
             </div>
           </div>
         ) : (
