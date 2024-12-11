@@ -75,9 +75,7 @@ export default function AskQuestion() {
     setChat(null);
     setMessages([]);
     setError(null);
-    // Generate a temporary ID for the new chat
-    const tempId = 'temp-' + Date.now();
-    navigate(`/dashboard/ask/${tempId}`);
+    navigate('/dashboard/ask?new=true', { replace: true });
   };
 
   const generateChatTitle = (message: string) => {
@@ -239,7 +237,7 @@ export default function AskQuestion() {
         className="flex-1 overflow-y-auto scroll-smooth"
         onScroll={handleScroll}
       >
-        {!isLoadingChat && messages.length === 0 ? (
+        {!isLoadingChat && messages.length === 0 && !loading ? (
           <div className="flex h-full flex-col items-center justify-center">
             <h1 className="mb-10 text-2xl font-bold">
               What can I help with?
